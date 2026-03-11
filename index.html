@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pranjal Saini — Portfolio</title>
+  <meta name="description"
+    content="Portfolio of Pranjal Saini — Game Developer, Python & Java Engineer. Explore projects, skills, and certifications." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Share+Tech+Mono&display=swap"
+    rel="stylesheet" />
+
+  <!-- Devicon (tech icons) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.16.0/devicon.min.css" />
+
+  <!-- Font Awesome (utility icons) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Force-kill scrollbar across ALL browsers -->
+  <style>
+    html,
+    body {
+      scrollbar-width: none !important;
+      -ms-overflow-style: none !important;
+    }
+
+    html::-webkit-scrollbar,
+    body::-webkit-scrollbar,
+    *::-webkit-scrollbar {
+      width: 0 !important;
+      height: 0 !important;
+      display: none !important;
+      background: transparent !important;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Cursor glow -->
+  <div class="cursor-glow" id="cursorGlow"></div>
+  <!-- Cursor dot (visible, morphing shape) -->
+  <div class="cursor-dot" id="cursorDot"></div>
+
+  <!-- Background particles -->
+  <div class="bg-particles" id="bgParticles"></div>
+
+  <!-- ───────── NAV ───────── -->
+  <nav class="glass-nav" id="mainNav">
+    <a href="#hero" class="nav-logo">PS</a>
+    <div class="nav-links">
+      <a href="#about">About</a>
+      <a href="#education">Education</a>
+      <a href="#projects">Projects</a>
+      <a href="#skills">Skills</a>
+      <a href="#certifications">Certs</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+  </nav>
+
+  <!-- ───────── HERO ───────── -->
+  <section class="hero" id="hero">
+    <div class="glass-panel hero-panel" data-speed="0.3">
+      <h1 class="glitch" data-text="Pranjal Saini">Pranjal Saini</h1>
+      <p class="hero-subtitle">Game Developer · Software Engineer</p>
+      <p class="hero-location"><i class="fa-solid fa-location-dot"></i> Greater Noida, India</p>
+      <div class="hero-links">
+        <a href="https://linkedin.com/in/pranjal-saini-246831295" target="_blank" rel="noopener" aria-label="LinkedIn">
+          <i class="fa-brands fa-linkedin"></i>
+        </a>
+        <a href="mailto:pranjalsaini3030@gmail.com" aria-label="Email">
+          <i class="fa-solid fa-envelope"></i>
+        </a>
+        <a href="https://github.com/Pranjal1108" target="_blank" rel="noopener" aria-label="GitHub">
+          <i class="fa-brands fa-github"></i>
+        </a>
+        <a href="https://www.instagram.com/_pranjal_saini_/" target="_blank" rel="noopener" aria-label="Instagram">
+          <i class="fa-brands fa-instagram"></i>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────── ABOUT ───────── -->
+  <section class="section" id="about">
+    <div class="glass-panel" data-speed="0.15">
+      <h2>About Me</h2>
+      <p>
+        Focused on game development, with experience in building gameplay features
+        and designing clean, intuitive interfaces. I enjoy developing projects from
+        the ground up and am currently exploring APIs and cloud fundamentals to
+        support more connected and scalable applications.
+      </p>
+    </div>
+  </section>
+
+  <!-- ───────── EDUCATION ───────── -->
+  <section class="section" id="education">
+    <div class="glass-panel" data-speed="0.2">
+      <h2>Education</h2>
+      <div class="edu-grid">
+
+        <div class="edu-card">
+          <div class="edu-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+          <h3>Galgotias University</h3>
+          <p class="edu-degree">B.Tech — Computer Science &amp; Engineering</p>
+          <p class="edu-meta">Greater Noida · Expected July 2027</p>
+        </div>
+
+        <div class="edu-card">
+          <div class="edu-icon"><i class="fa-solid fa-school"></i></div>
+          <h3>RPS Public School</h3>
+          <p class="edu-degree">Senior Secondary — 70% · Secondary — 72%</p>
+          <p class="edu-meta">Rewari</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────── PROJECTS ───────── -->
+  <section class="section" id="projects">
+    <div class="glass-panel" data-speed="0.25">
+      <h2>Projects</h2>
+      <div class="project-grid">
+
+        <div class="project-card">
+          <div class="project-header">
+            <i class="fa-solid fa-crosshairs project-icon"></i>
+            <h3>Aim Trainer</h3>
+            <span class="project-tag">Unity · C#</span>
+          </div>
+          <ul>
+            <li>Built a timed first-person aim trainer with raycast shooting, dynamic target spawning, and score
+              tracking.</li>
+            <li>Implemented UI systems including countdown timer, score display, and replayable game loop.</li>
+          </ul>
+        </div>
+
+        <div class="project-card">
+          <div class="project-header">
+            <i class="fa-solid fa-briefcase project-icon"></i>
+            <h3>Online Job Portal</h3>
+            <span class="project-tag">Java · Maven</span>
+          </div>
+          <ul>
+            <li>Developed a full-stack job portal supporting user registration, job listings, and application tracking.
+            </li>
+            <li>Implemented core backend logic using Java and Maven, focusing on clean modular structure.</li>
+          </ul>
+        </div>
+
+        <div class="project-card">
+          <div class="project-header">
+            <i class="fa-solid fa-chart-line project-icon"></i>
+            <h3>Airport Data Insights</h3>
+            <span class="project-tag">Python · Analytics</span>
+          </div>
+          <ul>
+            <li>Built a desktop analytics tool using Python (Pandas, Matplotlib, Tkinter) to analyze airport traffic
+              datasets.</li>
+            <li>Implemented custom GUI interactions, icon-based navigation, and image processing with PIL.</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────── SKILLS & TECH CONVEYOR ───────── -->
+  <section class="section" id="skills">
+    <div class="glass-panel" data-speed="0.18">
+      <h2>Technologies</h2>
+
+      <!-- Conveyor belt -->
+      <div class="conveyor-wrapper">
+        <div class="conveyor-track" id="conveyorTrack">
+          <!-- Original set -->
+          <div class="conveyor-icon" data-name="Java">
+            <i class="devicon-java-plain colored"></i>
+          </div>
+          <div class="conveyor-icon" data-name="Python">
+            <i class="devicon-python-plain colored"></i>
+          </div>
+          <div class="conveyor-icon" data-name="C#">
+            <i class="devicon-csharp-plain colored"></i>
+          </div>
+          <div class="conveyor-icon" data-name="Unity">
+            <i class="devicon-unity-plain colored"></i>
+          </div>
+          <div class="conveyor-icon" data-name="Git">
+            <i class="devicon-git-plain colored"></i>
+          </div>
+          <div class="conveyor-icon" data-name="GitHub">
+            <i class="devicon-github-original colored"></i>
+          </div>
+          <div class="conveyor-icon" data-name="Pandas">
+            <i class="devicon-pandas-plain colored"></i>
+          </div>
+          <div class="conveyor-icon" data-name="Matplotlib">
+            <i class="devicon-matplotlib-plain colored"></i>
+          </div>
+          <!-- Duplicate set for seamless loop -->
+          <div class="conveyor-icon" data-name="Java">
+            <i class="devicon-java-plain colored"></i>
+          </div>
+          <div class="conveyor-icon" data-name="Python">
+            <i class="devicon-python-plain colored"></i>
+          </div>
+          <div class="conveyor-icon" data-name="C#">
+            <i class="devicon-csharp-plain colored"></i>
+          </div>
+          <div class="conveyor-icon" data-name="Unity">
+            <i class="devicon-unity-plain colored"></i>
+          </div>
+          <div class="conveyor-icon" data-name="Git">
+            <i class="devicon-git-plain colored"></i>
+          </div>
+          <div class="conveyor-icon" data-name="GitHub">
+            <i class="devicon-github-original colored"></i>
+          </div>
+          <div class="conveyor-icon" data-name="Pandas">
+            <i class="devicon-pandas-plain colored"></i>
+          </div>
+          <div class="conveyor-icon" data-name="Matplotlib">
+            <i class="devicon-matplotlib-plain colored"></i>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="skills-heading-2">Skills</h2>
+
+      <div class="skills-grid">
+        <div class="skill-category">
+          <h3><i class="fa-solid fa-code"></i> Languages</h3>
+          <div class="skill-chips">
+            <span class="chip">Java</span>
+            <span class="chip">Python</span>
+            <span class="chip">C#</span>
+          </div>
+        </div>
+
+        <div class="skill-category">
+          <h3><i class="fa-solid fa-brain"></i> Core Skills</h3>
+          <div class="skill-chips">
+            <span class="chip">OOP</span>
+            <span class="chip">DSA</span>
+            <span class="chip">GUI (Tkinter)</span>
+            <span class="chip">Game Dev (Unity)</span>
+          </div>
+        </div>
+
+        <div class="skill-category">
+          <h3><i class="fa-solid fa-wrench"></i> Tools &amp; Tech</h3>
+          <div class="skill-chips">
+            <span class="chip">Git &amp; GitHub</span>
+            <span class="chip">Tkinter</span>
+            <span class="chip">Pandas</span>
+            <span class="chip">Matplotlib</span>
+            <span class="chip">PIL</span>
+            <span class="chip">Unity Engine</span>
+          </div>
+        </div>
+
+        <div class="skill-category">
+          <h3><i class="fa-solid fa-lightbulb"></i> Concepts</h3>
+          <div class="skill-chips">
+            <span class="chip">Problem Solving</span>
+            <span class="chip">Debugging</span>
+            <span class="chip">Software Design</span>
+            <span class="chip">Analytics &amp; Visualization</span>
+          </div>
+        </div>
+
+        <div class="skill-category">
+          <h3><i class="fa-solid fa-people-group"></i> Soft Skills</h3>
+          <div class="skill-chips">
+            <span class="chip">Team Collaboration</span>
+            <span class="chip">Fast Learning</span>
+            <span class="chip">Deadline-Oriented</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────── CERTIFICATIONS ───────── -->
+  <section class="section" id="certifications">
+    <div class="glass-panel" data-speed="0.22">
+      <h2>Certifications</h2>
+      <div class="cert-grid">
+
+        <div class="cert-card">
+          <i class="fa-solid fa-certificate cert-icon"></i>
+          <div>
+            <h3>Data Analytics</h3>
+            <p>Deloitte</p>
+          </div>
+        </div>
+
+        <div class="cert-card">
+          <i class="fa-solid fa-cloud cert-icon"></i>
+          <div>
+            <h3>Solutions Architecture</h3>
+            <p>AWS</p>
+          </div>
+        </div>
+
+        <div class="cert-card">
+          <i class="fa-solid fa-database cert-icon"></i>
+          <div>
+            <h3>Database Design</h3>
+            <p>Oracle</p>
+          </div>
+        </div>
+
+        <div class="cert-card">
+          <i class="fa-brands fa-python cert-icon"></i>
+          <div>
+            <h3>Expert Python Training</h3>
+            <p>Guvi</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────── CONTACT ───────── -->
+  <section class="section" id="contact">
+    <div class="glass-panel" data-speed="0.12">
+      <h2>Get In Touch</h2>
+      <p class="contact-text">I'm always open to new opportunities and collaborations. Feel free to reach out!</p>
+      <div class="contact-links">
+        <a href="mailto:pranjalsaini3030@gmail.com" class="contact-btn">
+          <i class="fa-solid fa-envelope"></i> Email Me
+        </a>
+        <a href="https://linkedin.com/in/pranjal-saini-246831295" target="_blank" rel="noopener" class="contact-btn">
+          <i class="fa-brands fa-linkedin"></i> LinkedIn
+        </a>
+        <a href="https://github.com/Pranjal1108" target="_blank" rel="noopener" class="contact-btn">
+          <i class="fa-brands fa-github"></i> GitHub
+        </a>
+        <a href="https://www.instagram.com/_pranjal_saini_/" target="_blank" rel="noopener" class="contact-btn">
+          <i class="fa-brands fa-instagram"></i> Instagram
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────── FOOTER ───────── -->
+  <footer class="footer">
+    <p>&copy; 2026 Pranjal Saini. Built with ☕ and passion.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
