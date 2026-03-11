@@ -28,9 +28,9 @@ function animateGlow() {
     cursorGlow.style.top = glowY + 'px';
   }
 
-  // Check if cursor is inside a glass panel
+  // Check if cursor is inside a glass panel or other main structural divs
   const el = document.elementFromPoint(mouseX, mouseY);
-  if (el && el.closest('.glass-panel')) {
+  if (el && el.closest('.glass-panel, .glass-nav, .footer')) {
     document.body.classList.add('cursor-on-glass');
   } else {
     document.body.classList.remove('cursor-on-glass');
