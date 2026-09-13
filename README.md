@@ -16,7 +16,7 @@ The game automatically pauses when the window or tab loses visibility, when the 
 
 ## Performance and assets
 
-The initial page loads one CSS file, one small deferred script and the SVG favicon. Two small game modules load on demand. Rendering is capped at 1.5 device pixels per CSS pixel and stops when not playing. Enemy and projectile counts are bounded. There are no third-party fonts, scripts, trackers, images or scroll listeners. Only the small decorative hero pane uses backdrop blur; scrolling content uses static translucent fills and borders.
+The initial page loads one CSS file, one small deferred script and the SVG favicon. Two small game modules load on demand. Rendering is capped at 1.5 device pixels per CSS pixel and stops when not playing. Enemy and projectile counts are bounded. There are no third-party fonts, scripts, trackers, images or scroll listeners. Main content panes use an 8px backdrop blur over static colour shapes; nested cards use translucent fills and highlights without stacking more blur filters. Reduced-transparency preferences and browsers without backdrop-filter receive a more opaque surface.
 
 The favicon and pixel artwork are local SVG/canvas shapes. The existing LittleUFO.glb asset is retained but never loaded by the page.
 
