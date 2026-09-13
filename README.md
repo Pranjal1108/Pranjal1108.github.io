@@ -1,19 +1,29 @@
-# Pranjal Saini — Portfolio
+# Pranjal Saini portfolio
 
-A static portfolio with an on-demand, keyboard-accessible memory game. Deploy the repository root with GitHub Pages; no build or dependencies are required.
+A static personal portfolio with a slate and sea-green glass design. Alien Shift is an original pixel arcade shooter integrated into the hero.
 
-## Performance
+## Preview and deployment
 
-- HTML, one stylesheet, and a deferred script are the only initial page resources.
-- No third-party scripts, icon fonts, web fonts, scroll handlers, animation loops, or backdrop filters.
-- `game.js` loads only after Play is selected. A single click handler updates the board; there are no timers or background animations.
-- Scrolling and anchor links use native browser behavior. Portfolio content stays visible when JavaScript is unavailable.
-- `LittleUFO.glb` is an existing source asset retained for future use; the page does not load it.
+Serve this directory with a static HTTP server. No install, build, API key or framework is needed. Open index.html through HTTP so the game modules can load.
+
+This revision is prepared on a separate branch. The owner will deploy it to GitHub Pages. Publish the repository root when ready. No custom domain has been configured.
 
 ## Game
 
-Select two cards to find a matching pair. A mismatch stays visible until a different card is selected, so there is no time pressure. Find six pairs to win; New game shuffles and resets the board. Use Tab and Enter/Space or tap/click. No scores or personal data are sent to a server.
+Clear three waves of aliens with three lives. Arrow keys or A/D move; Space fires. Touch or mouse: hold and drag on the canvas to move and fire. P or the Pause button pauses. Escape or Exit returns to the portfolio.
 
-## Manual checks
+The game automatically pauses when the window or tab loses visibility, when the hero leaves view or when the layout changes. Resume is explicit. Scores exist only in memory; there is no storage or server submission.
 
-Serve this folder with any static HTTP server (dynamic imports need HTTP). Check desktop and narrow mobile layouts, menu toggle/link closing/Escape, keyboard focus, mismatches, matches, six-pair completion, and restart. Verify the browser requests `game.js` only after Play and reports no console errors.
+## Performance and assets
+
+The initial page loads one CSS file, one small deferred script and the SVG favicon. Two small game modules load on demand. Rendering is capped at 1.5 device pixels per CSS pixel and stops when not playing. Enemy and projectile counts are bounded. There are no third-party fonts, scripts, trackers, images or scroll listeners. Only the small decorative hero pane uses backdrop blur; scrolling content uses static translucent fills and borders.
+
+The favicon and pixel artwork are local SVG/canvas shapes. The existing LittleUFO.glb asset is retained but never loaded by the page.
+
+## Pages
+
+- index.html: portfolio and arcade
+- privacy.html: actual site and game data handling, hosting and email links
+- terms.html: use of the portfolio and free game
+
+Keep the privacy page in sync if hosting, analytics, forms or storage are changed.

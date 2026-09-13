@@ -4,10 +4,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pranjal Saini — Portfolio</title>
+  <title>Pranjal Saini | Game Developer</title>
   <meta name="description"
-    content="Portfolio of Pranjal Saini — Game Developer, Python & Java Engineer. Explore projects, skills, and certifications." />
+    content="Pranjal Saini builds games in Unity and software in Java and Python. Projects, education and contact details." />
 
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="style.css" />
 </head>
 
@@ -21,44 +22,48 @@
       <a href="#education">Education</a>
       <a href="#projects">Projects</a>
       <a href="#skills">Skills</a>
-      <a href="#arcade">Play</a>
-      <a href="#certifications">Certs</a>
+
+      <a href="#certifications">Certifications</a>
       <a href="#contact">Contact</a>
     </div>
-    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-controls="navLinks" aria-expanded="false">
-      <span aria-hidden="true">☰</span>
-    </button>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-controls="navLinks" aria-expanded="false">Menu</button>
   </nav>
-  <section class="hero" id="hero">
-    <div class="glass-panel hero-panel">
-      <h1>Pranjal Saini</h1>
-      <p class="hero-subtitle">Game Developer · Software Engineer</p>
-      <p class="hero-location"> Greater Noida, India</p>
-      <div class="hero-links">
-        <a href="https://linkedin.com/in/pranjal-saini-246831295" target="_blank" rel="noopener" aria-label="LinkedIn">
-          <span aria-hidden="true">in</span>
-        </a>
-        <a href="mailto:pranjalsaini3030@gmail.com" aria-label="Email">
-          <span aria-hidden="true">✉</span>
-        </a>
-        <a href="https://github.com/Pranjal1108" target="_blank" rel="noopener" aria-label="GitHub">
-          <span aria-hidden="true">GH</span>
-        </a>
-        <a href="https://www.instagram.com/_pranjal_saini_/" target="_blank" rel="noopener" aria-label="Instagram">
-          <span aria-hidden="true">IG</span>
-        </a>
+  <main>
+  <section class="hero" id="hero" aria-labelledby="heroTitle">
+    <div class="hero-art" aria-hidden="true">
+      <div class="glass-sheet sheet-back"></div>
+      <div class="glass-sheet sheet-front">
+        <svg viewBox="0 0 11 8"><path d="M2 0h1v1H2zm6 0h1v1H8zM3 1h5v1H3zM2 2h7v1H2zM1 3h2v1H1zm3 0h3v1H4zm4 0h2v1H8zM0 4h11v1H0zM0 5h1v1H0zm2 0h7v1H2zm8 0h1v1h-1zM2 6h1v1H2zm6 0h1v1H8zM3 7h2v1H3zm3 0h2v1H6z"/></svg>
+        <span>ALIEN SHIFT / 01</span>
       </div>
+    </div>
+    <div class="hero-copy" id="heroCopy">
+      <p class="eyebrow">Game developer / Software engineer</p>
+      <h1 id="heroTitle">Pranjal<br>Saini<span>.</span></h1>
+      <p class="hero-description">I build gameplay in Unity and applications in Java and Python.</p>
+      <p class="hero-location">Greater Noida, India</p>
+      <div class="hero-actions">
+        <a class="contact-btn" href="#projects">View projects</a>
+        <button class="text-button" id="playGame" type="button" aria-describedby="arcadeHint">Play Alien Shift <span aria-hidden="true">↗</span></button>
+      </div>
+      <p class="arcade-hint" id="arcadeHint">A small arcade shooter, right here. Keyboard or touch.</p>
+      <p id="loadStatus" role="status"></p>
+      <noscript><p>The portfolio works without JavaScript. Enable it to play Alien Shift.</p></noscript>
+    </div>
+    <canvas id="arcadeCanvas" tabindex="0" aria-label="Alien Shift. Move with Left and Right or A and D. Hold Space to fire. On touch screens, drag to move and fire. P pauses, Escape exits." hidden></canvas>
+    <div class="arcade-hud" id="arcadeHud" hidden>
+      <p>ALIEN SHIFT</p><p id="scoreDisplay">Score 0 / Lives 3 / Wave 1</p>
+    </div>
+    <div class="arcade-message" id="arcadeMessage" hidden><p id="gameStatus" role="status" aria-live="polite"></p><button class="contact-btn" id="continueGame" type="button">Resume</button></div>
+    <div class="arcade-controls" id="arcadeControls" hidden>
+      <p>Move: ← → or A D / Fire: Space<br>Touch: drag to move and fire</p>
+      <div><button class="text-button" id="pauseGame" type="button">Pause</button><button class="text-button" id="exitGame" type="button">Exit</button></div>
     </div>
   </section>
   <section class="section" id="about">
     <div class="glass-panel">
       <h2>About Me</h2>
-      <p>
-        Focused on game development, with experience in building gameplay features
-        and designing clean, intuitive interfaces. I enjoy developing projects from
-        the ground up and am currently exploring APIs and cloud fundamentals to
-        support more connected and scalable applications.
-      </p>
+      <p>I study Computer Science and Engineering at Galgotias University. My projects include a first-person aim trainer in Unity, a Java job portal and a Python desktop tool for airport data analysis. I am currently learning APIs and cloud fundamentals.</p>
     </div>
   </section>
   <section class="section" id="education">
@@ -67,16 +72,14 @@
       <div class="edu-grid">
 
         <div class="edu-card">
-          <div class="edu-icon"></div>
           <h3>Galgotias University</h3>
-          <p class="edu-degree">B.Tech — Computer Science &amp; Engineering</p>
+          <p class="edu-degree">B.Tech | Computer Science &amp; Engineering</p>
           <p class="edu-meta">Greater Noida · Expected July 2027</p>
         </div>
 
         <div class="edu-card">
-          <div class="edu-icon"></div>
           <h3>RPS Public School</h3>
-          <p class="edu-degree">Senior Secondary — 70% · Secondary — 72%</p>
+          <p class="edu-degree">Senior Secondary | 70% · Secondary | 72%</p>
           <p class="edu-meta">Rewari</p>
         </div>
 
@@ -244,43 +247,30 @@
       </div>
     </div>
   </section>
-
-  <section class="section" id="arcade" aria-labelledby="arcadeTitle">
-    <div class="glass-panel">
-      <p class="eyebrow">Take a quick break</p>
-      <h2 id="arcadeTitle">Pixel Pairs</h2>
-      <p class="game-intro">Find all six matching pairs in as few moves as possible. Tap two cards to reveal them.</p>
-      <div class="game-toolbar">
-        <button class="contact-btn" id="playGame" type="button">Play Pixel Pairs</button>
-        <p id="gameStats">6 pairs · No time limit</p>
-      </div>
-      <p id="gameStatus" role="status" aria-live="polite"></p>
-      <div class="game-board" id="gameBoard" aria-label="Memory cards" hidden></div>
-      <noscript><p>Enable JavaScript to play Pixel Pairs. The rest of the portfolio works without it.</p></noscript>
-    </div>
-  </section>
   <section class="section" id="contact">
     <div class="glass-panel">
-      <h2>Get In Touch</h2>
-      <p class="contact-text">I'm always open to new opportunities and collaborations. Feel free to reach out!</p>
+      <h2>Contact</h2>
+      <p class="contact-text">For project enquiries and software development opportunities, email me or connect on LinkedIn.</p>
       <div class="contact-links">
         <a href="mailto:pranjalsaini3030@gmail.com" class="contact-btn">
-          <span aria-hidden="true">✉</span> Email Me
+          Email Me
         </a>
         <a href="https://linkedin.com/in/pranjal-saini-246831295" target="_blank" rel="noopener" class="contact-btn">
-          <span aria-hidden="true">in</span> LinkedIn
+          LinkedIn
         </a>
         <a href="https://github.com/Pranjal1108" target="_blank" rel="noopener" class="contact-btn">
-          <span aria-hidden="true">GH</span> GitHub
+          GitHub
         </a>
         <a href="https://www.instagram.com/_pranjal_saini_/" target="_blank" rel="noopener" class="contact-btn">
-          <span aria-hidden="true">IG</span> Instagram
+          Instagram
         </a>
       </div>
     </div>
   </section>
+  </main>
   <footer class="footer">
-    <p>&copy; 2026 Pranjal Saini. Built with ☕ and passion.</p>
+    <p>&copy; 2026 Pranjal Saini</p>
+    <div><a href="privacy.html">Privacy policy</a><a href="terms.html">Terms and conditions</a></div>
   </footer>
 
   <script src="script.js" defer></script>
