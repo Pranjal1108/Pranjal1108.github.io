@@ -58,3 +58,16 @@ test('exit restores portfolio, cancels frames and repeated starts cannot duplica
   startGame(); startGame(); assert.equal(frames.size,1);
   el('hero').emit('keydown',{key:'Escape',preventDefault(){}}); assert.equal(frames.size,0);
 });
+
+test('alternate games share pause, pointer input, resize and replay without switching back to aliens',()=> {
+  let state,inputs=[],starts=0;
+  const mode={title:'Test runner',instructions:'Tap to jump.',create(width,height){starts++;return state={width,height,status:'playing',score:0};},draw(){},hud(){return 'Runner';},victory(){return 'Finished';},step(game,dt,input){inputs.push(input);},resize(game,width,height){Object.assign(game,{width,height});}};
+  startGame(mode,el('runnerCard'));assert.equal(starts,1);assert.equal(frames.size,1);
+  el('arcadeCanvas').emit('pointerdown',{pointerId:1,pointerType:'touch',clientX:50});tick(3000);assert.equal(inputs.at(-1).jump,true);
+  tick(3016);assert.equal(inputs.at(-1).jump,false);
+  click('pauseGame');assert.equal(frames.size,0);click('continueGame');assert.equal(frames.size,1);
+  el('hero').clientWidth=400;resize();assert.equal(state.width,400);assert.equal(frames.size,0);
+  click('continueGame');state.status='won';tick(3032);assert.equal(frames.size,0);
+  click('continueGame');assert.equal(starts,2);assert.equal(frames.size,1);
+  click('exitGame');assert.equal(frames.size,0);assert.equal(document.activeElement.id,'runnerCard');
+});

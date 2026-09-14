@@ -14,9 +14,10 @@ const playButton = document.getElementById('playGame');
 const keys = new Set();
 const alienPixels = ['00100000100','00010001000','00111111100','01101110110','11111111111','10111111101','10100000101','00011011000'];
 const shipPixels = ['000010000','000111000','000111000','011111110','111111111','111111111'];
+let mode = null, returnButton = playButton, jumpQueued = false;
 let game, frame = 0, lastTime = 0, running = false, active = false, pointer = null, targetX, dpr = 1, lastHud = '';
 
-function clearInput() { keys.clear(); pointer = null; targetX = undefined; }
+function clearInput() { keys.clear(); jumpQueued = false; pointer = null; targetX = undefined; }
 function dimensions() {
   const width = hero.clientWidth, height = hero.clientHeight;
   dpr = Math.min(window.devicePixelRatio || 1, 1.5);
@@ -33,6 +34,7 @@ function sprite(pixels, x, y, size, color) {
   }
 }
 function draw() {
+  if (mode) { mode.draw(ctx,game); const text=mode.hud(game); if(text!==lastHud) { scoreDisplay.textContent=text; lastHud=text; } return; }
   ctx.fillStyle = '#102d35';
   ctx.fillRect(0,0,game.width,game.height);
   ctx.fillStyle = '#31525a';
@@ -66,11 +68,12 @@ function tick(time) {
   if (!running) return;
   const elapsed = lastTime ? (time-lastTime)/1000 : 0;
   lastTime = time;
-  stepGame(game,elapsed,{left: keys.has('ArrowLeft') || keys.has('a'), right: keys.has('ArrowRight') || keys.has('d'), fire: keys.has(' ') || pointer !== null, targetX});
+  (mode?.step || stepGame)(game,elapsed,{jump: jumpQueued, left: keys.has('ArrowLeft') || keys.has('a'), right: keys.has('ArrowRight') || keys.has('d'), fire: keys.has(' ') || pointer !== null, targetX});
+  jumpQueued = false;
   draw();
   if (game.status !== 'playing') {
     stopLoop();
-    status.textContent = game.status === 'won' ? `All three waves cleared. Final score: ${game.score}.` : `Game over. Score: ${game.score}.`;
+    status.textContent = game.status === 'won' ? (mode ? mode.victory(game) : `All three waves cleared. Final score: ${game.score}.`) : `Game over. Score: ${game.score}.`;
     continueButton.textContent = 'Play again';
     message.hidden = false;
     pauseButton.hidden = true;
@@ -81,7 +84,7 @@ function tick(time) {
 }
 function resume() {
   if (!active || running || document.hidden) return;
-  if (game.status !== 'playing') { startGame(); return; }
+  if (game.status !== 'playing') { startGame(mode,returnButton); return; }
   clearInput();
   message.hidden = true;
   pauseButton.textContent = 'Pause';
@@ -90,14 +93,22 @@ function resume() {
   canvas.focus({preventScroll:true});
   frame = requestAnimationFrame(tick);
 }
-export function startGame() {
+export function startGame(selectedMode = null, trigger = playButton) {
+  mode = selectedMode; returnButton = trigger;
   if (!ctx) throw new Error('Canvas is unavailable.');
   stopLoop();
   active = true;
   hero.classList.add('playing');
   for (const el of [canvas,hud,controls,pauseButton]) el.hidden = false;
   const {width,height} = dimensions();
-  game = createGame(width,height);
+  game = (mode?.create || createGame)(width,height);
+  const title = mode?.title || 'Alien Shift';
+  const instructions = mode?.instructions || 'Move: Left / Right or A D. Fire: Space. Touch: drag to move and fire.';
+  document.getElementById('gameTitle').textContent = title.toUpperCase();
+  document.getElementById('gameInstructions').textContent = instructions;
+  canvas.ariaLabel = title + '. ' + instructions + ' P pauses. Escape exits.';
+  document.getElementById('gameDeck').inert = true;
+  hero.dispatchEvent?.(new Event('arcadestart'));
   draw();
   hero.scrollIntoView({block:'start',behavior:'instant'});
   resume();
@@ -107,13 +118,16 @@ function exitGame() {
   active = false;
   for (const el of [canvas,hud,controls,message]) el.hidden = true;
   hero.classList.remove('playing');
-  playButton.focus({preventScroll:true});
+  document.getElementById('gameDeck').inert = false;
+  returnButton.focus({preventScroll:true});
+  hero.dispatchEvent?.(new Event('arcadeexit'));
 }
 pauseButton.addEventListener('click', () => running ? pause() : resume());
 continueButton.addEventListener('click',resume);
 document.getElementById('exitGame').addEventListener('click',exitGame);
 canvas.addEventListener('keydown', event => {
   const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
+  if ([' ', 'ArrowUp', 'w'].includes(key)) { event.preventDefault(); if (running && !event.repeat) jumpQueued = true; }
   if (['ArrowLeft','ArrowRight','a','d',' '].includes(key)) { event.preventDefault(); if (running) keys.add(key); }
   if (key === 'p' && !event.repeat) { event.preventDefault(); running ? pause() : resume(); }
 });
@@ -128,6 +142,7 @@ canvas.addEventListener('blur', event => {
 canvas.addEventListener('pointerdown', event => {
   if (!running || (event.pointerType === 'mouse' && event.button !== 0)) return;
   canvas.focus({preventScroll:true});
+  jumpQueued = true;
   pointer = event.pointerId;
   canvas.setPointerCapture(pointer);
   targetX = event.clientX-canvas.getBoundingClientRect().left;
@@ -147,6 +162,6 @@ new ResizeObserver(() => {
   if (!active || (hero.clientWidth === game.width && hero.clientHeight === game.height)) return;
   pause('Layout resized. Resume when ready.');
   const {width,height} = dimensions();
-  resizeGame(game,width,height);
+  (mode?.resize || resizeGame)(game,width,height);
   draw();
 }).observe(hero);

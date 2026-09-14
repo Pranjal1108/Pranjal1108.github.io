@@ -1,29 +1,33 @@
 # Pranjal Saini portfolio
 
-A static personal portfolio with a slate and sea-green glass design. Alien Shift is an original pixel arcade shooter integrated into the hero.
+A dependency-free portfolio with slate and sea-green glass panels and three original arcade games integrated into the hero.
 
 ## Preview and deployment
 
-Serve this directory with a static HTTP server. No install, build, API key or framework is needed. Open index.html through HTTP so the game modules can load.
+Serve this directory with a static HTTP server. No install, build, API key or framework is needed. Open index.html through HTTP so game modules can load.
 
-This revision is prepared on a separate branch. The owner will deploy it to GitHub Pages. Publish the repository root when ready. No custom domain has been configured.
+Changes are saved on revision/glass-arcade. The owner handles GitHub Pages deployment. Publish the repository root when ready. No custom domain has been configured.
 
-## Game
+## Arcade
 
-Clear three waves of aliens with three lives. Arrow keys or A/D move; Space fires. Touch or mouse: hold and drag on the canvas to move and fire. P or the Pause button pauses. Escape or Exit returns to the portfolio.
+- Alien Shift: clear three waves with three lives. Left/Right or A/D to move, Space to fire. Drag on the canvas to move and fire.
+- Skyline Run: an automatic rooftop runner with eight platforms and collectible gems. Space, Up, W, or a tap/click jumps. Reach the final flag. Falling costs a life and restarts from the last rooftop.
+- Pocket Circuit: a 45-second traffic-dodging sprint with three lives. Left/Right or A/D to steer, or drag on the canvas.
 
-The game automatically pauses when the window or tab loses visibility, when the hero leaves view or when the layout changes. Resume is explicit. Scores exist only in memory; there is no storage or server submission.
+P or Pause pauses each game. Escape or Exit returns to the selected card. The games pause when hidden, offscreen, inactive or resized; resume is explicit. Replay restarts the same game. Scores are held only in memory.
 
-## Performance and assets
+## Cards and performance
 
-The initial page loads one CSS file, one small deferred script and the SVG favicon. Two small game modules load on demand. Rendering is capped at 1.5 device pixels per CSS pixel and stops when not playing. Enemy and projectile counts are bounded. There are no third-party fonts, scripts, trackers, images or scroll listeners. Main content panes use an 8px backdrop blur over static colour shapes; nested cards use translucent fills and highlights without stacking more blur filters. Reduced-transparency preferences and browsers without backdrop-filter receive a more opaque surface.
+Three glass cards cycle every 4.2 seconds with CSS flip transitions. Previous/Next and Pause rotation controls are available. Rotation pauses on hover, keyboard focus, gameplay, hidden tabs and when the deck is offscreen. Reduced-motion preferences disable automatic cycling and transitions.
 
-The favicon and pixel artwork are local SVG/canvas shapes. The existing LittleUFO.glb asset is retained but never loaded by the page.
+The initial page loads local HTML, CSS, one small deferred script and an SVG favicon. Game code loads only after Play. The two extra games share a small module; all three share one canvas lifecycle with a 1.5 pixel-density cap. No framework, external font, tracker, scroll listener, image download or score storage is used. Rendering stops whenever a game is paused or exited. Traffic, projectiles and level geometry are bounded.
 
-## Pages
+Main content panes use an 8px backdrop blur over static colour shapes. Moving cards use translucent fills and highlights without animated blur filters. Reduced-transparency preferences receive opaque surfaces. The retained LittleUFO.glb is never loaded.
 
-- index.html: portfolio and arcade
-- privacy.html: actual site and game data handling, hosting and email links
-- terms.html: use of the portfolio and free game
+## Verification
 
-Keep the privacy page in sync if hosting, analytics, forms or storage are changed.
+Run: node --test tests/*.test.mjs
+
+Tests cover movement, collisions, complete winning/losing runs, responsive coordinates, score state, and pause/resume/exit rendering. Check browser keyboard/pointer controls and responsive layouts after UI changes.
+
+Privacy and terms pages describe the actual site behaviour. Keep them current if tracking, forms or storage change.

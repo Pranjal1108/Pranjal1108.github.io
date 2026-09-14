@@ -31,12 +31,6 @@ h1,h2,h3 { line-height: 1.1; }
 .text-button { padding: .6rem .15rem; min-height: 44px; border: 0; border-bottom: 1px solid currentColor; border-radius: 0; color: var(--ink); background: transparent; font-size: .88rem; }
 .arcade-hint { margin-top: 1rem; font-size: .75rem; color: var(--muted); }
 #loadStatus { font-size: .85rem; }
-.hero-art { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
-.glass-sheet { position: absolute; width: 300px; height: 370px; right: 40px; top: 120px; border: 1px solid rgba(255,255,255,.85); border-radius: 12px; }
-.sheet-back { transform: rotate(14deg); background: #83b7ac; top: 95px; right: 95px; box-shadow: 12px 22px 0 rgba(24,74,79,.08); }
-.sheet-front { transform: rotate(-9deg); background: rgba(241,253,254,.38); backdrop-filter: blur(8px); box-shadow: inset 1px 1px 0 #fff, 0 25px 40px rgba(27,57,63,.1); display: flex; align-items: center; justify-content: center; }
-.sheet-front svg { width: 55%; height: auto; fill: #214f51; opacity: .85; }
-.sheet-front span { position: absolute; bottom: 1.5rem; left: 1.5rem; font: .65rem ui-monospace,monospace; letter-spacing: .12em; }
 .section { position: relative; isolation: isolate; max-width: 1120px; margin: 0 auto; padding: 0 1.5rem 2.5rem; }
 /* Static colour behind the panes makes their transparency visible. */
 .section::before,.section::after,.legal-page::before { content: ''; position: absolute; z-index: -1; pointer-events: none; border-radius: 14px; }
@@ -70,7 +64,7 @@ p,li { font-size: .95rem; }
 .footer p,.footer a { font-size: .75rem; }
 .footer div { display: flex; flex-wrap: wrap; gap: 1.5rem; }
 .hero.playing { background: #102d35; color: #e5f2ef; min-height: 0; height: clamp(480px,calc(100svh - 100px),760px); }
-.playing .hero-copy,.playing .hero-art { visibility: hidden; pointer-events: none; }
+.playing .hero-copy { visibility: hidden; pointer-events: none; }
 #arcadeCanvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 3; touch-action: none; outline-offset: -5px; }
 .arcade-hud { position: absolute; left: 1.5rem; right: 1.5rem; top: 1rem; z-index: 4; display: flex; justify-content: space-between; gap: .5rem; pointer-events: none; }
 .arcade-hud p { font: .75rem/1.6 ui-monospace,monospace; }
@@ -86,7 +80,7 @@ p,li { font-size: .95rem; }
 .legal-page h1 { font-size: clamp(2rem,5vw,3.3rem); letter-spacing: -.04em; margin-bottom: 1.5rem; }
 .legal-page h2 { font-size: 1.3rem; margin: 2rem 0 .7rem; }
 .legal-page p { margin-bottom: 1rem; }
-@media (max-width: 900px) { .glass-sheet { width: 220px; height: 290px; right: 20px; top: 175px; } .sheet-back { right: 45px; top: 145px; } .hero-copy { max-width: 530px; } .nav-links { gap: 1rem; } }
+@media (max-width: 900px) {   .hero-copy { max-width: 530px; } .nav-links { gap: 1rem; } }
 @media (max-width: 720px) {
   .glass-nav { padding: .7rem 1.25rem; }
   .nav-toggle { display: block; }
@@ -95,9 +89,9 @@ p,li { font-size: .95rem; }
   .nav-links a { display: block; padding: .7rem 1.5rem; }
   .hero-copy { padding: 3rem 1.5rem 2.5rem; }
   .hero { min-height: 700px; }
-  .hero-art { opacity: .4; }
-  .glass-sheet { width: 140px; height: 180px; right: -30px; top: 130px; }
-  .sheet-back { right: -10px; top: 110px; }
+
+
+
   .hero-description { max-width: 270px; }
   .hero h1 { font-size: 5rem; }
   .hero-actions { gap: 1rem; }
@@ -112,5 +106,43 @@ p,li { font-size: .95rem; }
   .arcade-controls div { gap: .75rem; }
   .hero.playing { min-height: 0; }
 }
-@media (prefers-reduced-transparency: reduce) { .glass-panel,.sheet-front { background: #e7eff0; backdrop-filter: none; -webkit-backdrop-filter: none; } .edu-card,.project-card,.cert-card,.skill-category { background: #edf3f4; } }
+@media (prefers-reduced-transparency: reduce) { .glass-panel { background: #e7eff0; backdrop-filter: none; -webkit-backdrop-filter: none; } .edu-card,.project-card,.cert-card,.skill-category { background: #edf3f4; } }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .glass-panel { background: rgba(237,247,248,.85); } }
+/* The requested rotating game deck is the only decorative motion on the page. */
+.hero { display: grid; grid-template-columns: 1.1fr 1fr; align-items: center; }
+.hero-copy { max-width: 610px; }
+.game-deck { position: relative; z-index: 2; min-width: 0; padding: 2rem 2rem 2rem 1rem; }
+.game-stack { position: relative; height: 375px; perspective: 1200px; margin: 1rem 1.5rem 2rem 0; }
+.game-card { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: flex-start; padding: 1.5rem; border: 1px solid #eefcfc; border-radius: 12px; background: rgba(227,245,244,.8); box-shadow: inset 1px 1px 0 #fff,0 18px 28px #173f4618; transform-origin: 50% 70%; transition: transform .8s ease,opacity .6s ease; backface-visibility: hidden; }
+.game-card[data-game="platform"] { background: rgba(197,225,233,.9); }
+.game-card[data-game="race"] { background: rgba(182,216,204,.9); }
+.game-card[data-slot="0"] { transform: rotate(-5deg) rotateY(0); z-index: 3; }
+.game-card[data-slot="1"] { transform: translate(18px,-12px) rotate(6deg) rotateY(-180deg); z-index: 1; opacity: .65; backface-visibility: visible; }
+.game-card[data-slot="2"] { transform: translate(28px,8px) rotate(11deg) rotateY(-180deg); z-index: 0; opacity: .35; backface-visibility: visible; }
+.game-card:not([data-slot="0"]) > * { visibility: hidden; }
+.card-number { font: .65rem/1.5 ui-monospace,monospace; letter-spacing: .1em; color: var(--muted); }
+.game-card svg { height: 90px; width: 125px; margin: 1.5rem auto; fill: #214f51; }
+.game-card h2 { margin-bottom: .6rem; font-size: 1.7rem; }
+.game-card p { font-size: .83rem; margin-bottom: 1rem; }
+.game-card .contact-btn { margin-top: auto; }
+.deck-controls { display: flex; align-items: center; justify-content: center; gap: 1rem; }
+.deck-controls > .text-button { min-width: 44px; }
+.deck-controls p { font: .7rem ui-monospace,monospace; white-space: nowrap; }
+#rotateCards { font-size: .72rem; }
+.deck-selection { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.playing .game-deck { visibility: hidden; pointer-events: none; }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .game-deck:hover .game-card[data-slot="0"] { transform: translateY(-8px) rotate(0) rotateY(7deg); }
+  .game-card .contact-btn:hover { transform: translateY(-2px); }
+}
+@media (max-width: 900px) and (min-width: 721px) { .hero { grid-template-columns: 1fr 1fr; } .game-deck { padding-right: 2rem; } .game-card { padding: 1.25rem; } }
+@media (max-width: 720px) {
+  .hero { grid-template-columns: 1fr; }
+  .hero-copy { padding-bottom: 1rem; }
+  .game-deck { width: min(100%,430px); margin: 0 auto; padding: 1rem 2.5rem 2rem; }
+  .game-stack { margin-right: 0; height: 365px; }
+  .hero.playing { display: block; }
+  .deck-controls { gap: .5rem; }
+}
+@media (prefers-reduced-motion: reduce) { .game-card { transition: none; } }
+@media (prefers-reduced-transparency: reduce) { .game-card { background: #e0efec; } }

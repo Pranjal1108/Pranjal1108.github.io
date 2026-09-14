@@ -30,13 +30,6 @@
   </nav>
   <main>
   <section class="hero" id="hero" aria-labelledby="heroTitle">
-    <div class="hero-art" aria-hidden="true">
-      <div class="glass-sheet sheet-back"></div>
-      <div class="glass-sheet sheet-front">
-        <svg viewBox="0 0 11 8"><path d="M2 0h1v1H2zm6 0h1v1H8zM3 1h5v1H3zM2 2h7v1H2zM1 3h2v1H1zm3 0h3v1H4zm4 0h2v1H8zM0 4h11v1H0zM0 5h1v1H0zm2 0h7v1H2zm8 0h1v1h-1zM2 6h1v1H2zm6 0h1v1H8zM3 7h2v1H3zm3 0h2v1H6z"/></svg>
-        <span>ALIEN SHIFT / 01</span>
-      </div>
-    </div>
     <div class="hero-copy" id="heroCopy">
       <p class="eyebrow">Game developer / Software engineer</p>
       <h1 id="heroTitle">Pranjal<br>Saini<span>.</span></h1>
@@ -46,17 +39,46 @@
         <a class="contact-btn" href="#projects">View projects</a>
         <button class="text-button" id="playGame" type="button" aria-describedby="arcadeHint">Play Alien Shift <span aria-hidden="true">↗</span></button>
       </div>
-      <p class="arcade-hint" id="arcadeHint">A small arcade shooter, right here. Keyboard or touch.</p>
+      <p class="arcade-hint" id="arcadeHint">Three small arcade games, right here. Keyboard or touch.</p>
       <p id="loadStatus" role="status"></p>
-      <noscript><p>The portfolio works without JavaScript. Enable it to play Alien Shift.</p></noscript>
+      <noscript><p>The portfolio works without JavaScript. Enable it to play the arcade games.</p></noscript>
+    </div>
+    <div class="game-deck" id="gameDeck" role="region" aria-label="Choose an arcade game" aria-roledescription="carousel">
+      <div class="game-stack">
+        <article class="game-card" data-game="alien" data-slot="0" >
+          <span class="card-number">01 / SPACE SHOOTER</span>
+          <svg aria-hidden="true" viewBox="0 0 11 8"><path d="M2 0h1v1H2zm6 0h1v1H8zM3 1h5v1H3zM2 2h7v1H2zM1 3h2v1H1zm3 0h3v1H4zm4 0h2v1H8zM0 4h11v1H0zM0 5h1v1H0zm2 0h7v1H2zm8 0h1v1h-1zM2 6h1v1H2zm6 0h1v1H8zM3 7h2v1H3zm3 0h2v1H6z"/></svg>
+          <h2>Alien Shift</h2><p>Clear three waves. Hold your ground.</p>
+          <button class="contact-btn game-launch" data-game="alien" type="button">Play Alien Shift</button>
+        </article>
+        <article class="game-card" data-game="platform" data-slot="1" inert aria-hidden="true">
+          <span class="card-number">02 / PLATFORMER</span>
+          <svg aria-hidden="true" viewBox="0 0 11 8"><path d="M4 0h3v2H4zM3 2h5v3H3zM2 3h1v2H2zm6 0h1v2H8zM3 5h2v2H3zm3 0h2v2H6zM0 7h5v1H0zm7 0h4v1H7z"/></svg>
+          <h2>Skyline Run</h2><p>Jump the gaps. Reach the rooftop flag.</p>
+          <button class="contact-btn game-launch" data-game="platform" type="button">Play Skyline Run</button>
+        </article>
+        <article class="game-card" data-game="race" data-slot="2" inert aria-hidden="true">
+          <span class="card-number">03 / ROAD RACER</span>
+          <svg aria-hidden="true" viewBox="0 0 11 8"><path d="M4 0h3v1H4zM3 1h5v6H3zM2 2h1v2H2zm6 0h1v2H8zM4 2h3v1H4zM2 5h1v2H2zm6 0h1v2H8zM4 7h3v1H4z"/><path fill="#b6d8cc" d="M4 2h3v1H4zM4 5h3v1H4z"/></svg>
+          <h2>Pocket Circuit</h2><p>Dodge traffic. Finish a 45-second sprint.</p>
+          <button class="contact-btn game-launch" data-game="race" type="button">Play Pocket Circuit</button>
+        </article>
+      </div>
+      <div class="deck-controls">
+        <button class="text-button" id="previousCard" aria-label="Previous game" type="button">←</button>
+        <p id="deckPosition">01 / 03</p>
+        <button class="text-button" id="nextCard" aria-label="Next game" type="button">→</button>
+        <button class="text-button" id="rotateCards" type="button">Pause rotation</button>
+      </div>
+      <p class="deck-selection" id="deckAnnouncement" role="status"></p>
     </div>
     <canvas id="arcadeCanvas" tabindex="0" aria-label="Alien Shift. Move with Left and Right or A and D. Hold Space to fire. On touch screens, drag to move and fire. P pauses, Escape exits." hidden></canvas>
     <div class="arcade-hud" id="arcadeHud" hidden>
-      <p>ALIEN SHIFT</p><p id="scoreDisplay">Score 0 / Lives 3 / Wave 1</p>
+      <p id="gameTitle">ALIEN SHIFT</p><p id="scoreDisplay">Score 0 / Lives 3 / Wave 1</p>
     </div>
     <div class="arcade-message" id="arcadeMessage" hidden><p id="gameStatus" role="status" aria-live="polite"></p><button class="contact-btn" id="continueGame" type="button">Resume</button></div>
     <div class="arcade-controls" id="arcadeControls" hidden>
-      <p>Move: ← → or A D / Fire: Space<br>Touch: drag to move and fire</p>
+      <p id="gameInstructions">Move: ← → or A D / Fire: Space<br>Touch: drag to move and fire</p>
       <div><button class="text-button" id="pauseGame" type="button">Pause</button><button class="text-button" id="exitGame" type="button">Exit</button></div>
     </div>
   </section>
