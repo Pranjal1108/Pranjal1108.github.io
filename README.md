@@ -1,6 +1,6 @@
 # Pranjal Saini portfolio
 
-A dependency-free portfolio with slate and sea-green glass panels and three original arcade games integrated into the hero.
+A dependency-free portfolio with deep navy and frosted teal glass panels and three original arcade games integrated into the hero.
 
 ## Preview and deployment
 
@@ -31,3 +31,7 @@ Run: node --test tests/*.test.mjs
 Tests cover movement, collisions, complete winning/losing runs, responsive coordinates, score state, and pause/resume/exit rendering. Check browser keyboard/pointer controls and responsive layouts after UI changes.
 
 Privacy and terms pages describe the actual site behaviour. Keep them current if tracking, forms or storage change.
+
+## Colour palette
+
+Deep navy #0b1823 forms the backdrop; ice #eef6f4 and muted blue-grey #b8ccd0 provide text contrast. Mint #8be0be identifies primary actions. Teal and steel-blue shapes show through the glass panes. The game cards use mint, ice-blue and amber artwork to distinguish shooter, platformer and racer. Colours are local CSS tokens with no added assets or runtime effects.
