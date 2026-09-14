@@ -2,7 +2,7 @@
 
 - Preserve the owner's real project, education and contact information.
 - Use restrained glass styling with slate and sea-green tones. No purple gradients, pill buttons, emoji icons, stock/AI photos, vague marketing copy, em dashes, fabricated reviews, metrics, customer counters or AI branding.
-- No cursor animations or scroll-driven transforms. Keep native scrolling. The user requested a continuously cycling, flipping game-card deck with hover effects. Pause rotation on focus, hover, offscreen, hidden tabs and gameplay; respect reduced motion.
+- Keep native scrolling. The user requested a continuously cycling, flipping game-card deck with hover effects plus four restrained flying objects that burst on cursor collision. The objects never follow or replace the cursor. Pause decorative motion during gameplay and in hidden tabs; respect reduced motion.
 - Integrate the arcade game into the hero rather than adding a separate game card or section. Load game modules only on request and stop rendering when paused, hidden, offscreen or exited.
 - Prefer the existing dependency-free implementation. Any extra technology must justify its performance cost.
 - Keep the favicon, privacy policy and terms page working and consistent with actual data handling.

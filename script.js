@@ -72,3 +72,8 @@ async function launch(kind,trigger) {
 }
 playButton.addEventListener('click',()=>launch(cards[selected].dataset.game,playButton));
 deck.querySelectorAll('.game-launch').forEach(button=>button.addEventListener('click',()=>launch(button.dataset.game,button)));
+
+// Load the decorative collision layer after the portfolio is interactive.
+const loadAmbient = () => import('./ambient.js').catch(() => {});
+if ('requestIdleCallback' in window) requestIdleCallback(loadAmbient,{timeout:1200});
+else setTimeout(loadAmbient,600);

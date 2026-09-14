@@ -35,3 +35,7 @@ Privacy and terms pages describe the actual site behaviour. Keep them current if
 ## Colour palette
 
 Deep navy #0b1823 forms the backdrop; ice #eef6f4 and muted blue-grey #b8ccd0 provide text contrast. Mint #8be0be identifies primary actions. Teal and steel-blue shapes show through the glass panes. The game cards use mint, ice-blue and amber artwork to distinguish shooter, platformer and racer. Colours are local CSS tokens with no added assets or runtime effects.
+
+## Ambient motion
+
+Four small inline SVG objects move behind the portfolio content: a rocket with a stepped flame, a UFO, a satellite and an aircraft. Desktop pointer contact triggers a short CSS particle burst. Cursor motion is checked at most once per display frame using its complete path; a low-frequency check detects an object reaching a stationary cursor. Both checks cover only four compact hit regions and stop when the pointer leaves, a game starts, the tab is hidden or reduced motion is enabled. Mobile hides the satellite and disables collision checks because there is no fine pointer. No image request, canvas layer, scroll handler or additional animation library is used.
