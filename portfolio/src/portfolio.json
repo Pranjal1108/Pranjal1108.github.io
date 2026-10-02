@@ -1,0 +1,191 @@
+{
+  "name": "Pranjal Saini",
+  "role": "Computer Science Student · Software Developer",
+  "location": "Greater Noida, India",
+  "about": "I’m Pranjal, a Computer Science student at Galgotias University. I enjoy building projects from the ground up, from Python tools and Java applications to experimenting with gameplay in Unity. I’m currently exploring APIs and cloud fundamentals to build more connected applications.",
+  "education": [
+    {
+      "name": "Galgotias University",
+      "degree": "B.Tech — Computer Science & Engineering",
+      "meta": "Greater Noida · Expected July 2027"
+    },
+    {
+      "name": "RPS Public School",
+      "degree": "Senior Secondary — 70% · Secondary — 72%",
+      "meta": "Rewari"
+    }
+  ],
+  "projects": [
+    {
+      "name": "GIT PUSHer",
+      "tech": "Python · Git · GitHub · Tesseract OCR",
+      "url": "https://github.com/Pranjal1108/git-pusher",
+      "points": [
+        "Built a Python tool that sets up Git, creates GitHub repositories, and automates commits and pushes from a project folder.",
+        "Added branch selection, preservation of existing remotes, pre-commit credential checks, and optional OCR-based terminal error detection."
+      ]
+    },
+    {
+      "name": "Aim Trainer",
+      "tech": "Unity · C#",
+      "points": [
+        "Built a timed first-person aim trainer with raycast shooting, dynamic target spawning, and score tracking.",
+        "Implemented UI systems including countdown timer, score display, and replayable game loop."
+      ]
+    },
+    {
+      "name": "Online Job Portal",
+      "tech": "Java · Maven",
+      "points": [
+        "Developed a full-stack job portal supporting user registration, job listings, and application tracking.",
+        "Implemented core backend logic using Java and Maven, focusing on clean modular structure."
+      ]
+    },
+    {
+      "name": "Airport Data Insights",
+      "tech": "Python · Analytics",
+      "points": [
+        "Built a desktop analytics tool using Python (Pandas, Matplotlib, Tkinter) to analyze airport traffic datasets.",
+        "Implemented custom GUI interactions, icon-based navigation, and image processing with PIL."
+      ]
+    }
+  ],
+  "technologies": [
+    "Java",
+    "Python",
+    "C#",
+    "Unity",
+    "Git",
+    "GitHub",
+    "Pandas",
+    "Matplotlib",
+    "HTML5",
+    "CSS3",
+    "JavaScript"
+  ],
+  "skills": [
+    {
+      "name": "Languages",
+      "items": [
+        "Java",
+        "Python",
+        "C#",
+        "JavaScript",
+        "HTML/CSS"
+      ]
+    },
+    {
+      "name": "Core Skills",
+      "items": [
+        "OOP",
+        "DSA",
+        "GUI (Tkinter)",
+        "Game Dev (Unity)"
+      ]
+    },
+    {
+      "name": "Tools & Tech",
+      "items": [
+        "Git & GitHub",
+        "Tkinter",
+        "Pandas",
+        "Matplotlib",
+        "PIL",
+        "Unity Engine"
+      ]
+    },
+    {
+      "name": "Concepts",
+      "items": [
+        "Problem Solving",
+        "Debugging",
+        "Software Design",
+        "Analytics & Visualization"
+      ]
+    },
+    {
+      "name": "Soft Skills",
+      "items": [
+        "Team Collaboration",
+        "Fast Learning",
+        "Deadline-Oriented"
+      ]
+    }
+  ],
+  "certifications": [
+    {
+      "name": "Data Analytics",
+      "issuer": "Deloitte"
+    },
+    {
+      "name": "Solutions Architecture",
+      "issuer": "AWS"
+    },
+    {
+      "name": "Database Design",
+      "issuer": "Oracle"
+    },
+    {
+      "name": "Expert Python Training",
+      "issuer": "Guvi"
+    }
+  ],
+  "contact": "I'm always open to new opportunities and collaborations. Feel free to reach out!",
+  "links": [
+    {
+      "name": "✉ Email Me",
+      "href": "mailto:pranjalsaini3030@gmail.com"
+    },
+    {
+      "name": "LinkedIn",
+      "href": "https://linkedin.com/in/pranjal-saini-246831295"
+    },
+    {
+      "name": "GitHub",
+      "href": "https://github.com/Pranjal1108"
+    },
+    {
+      "name": "Instagram",
+      "href": "https://www.instagram.com/_pranjal_saini_/"
+    }
+  ],
+  "source": "https://pranjal1108.github.io/",
+  "favorites": [
+    {
+      "name": "Spider-Man",
+      "detail": "Marvel",
+      "color": "#cf444a",
+      "mark": "01"
+    },
+    {
+      "name": "The Joker",
+      "detail": "Heath Ledger’s portrayal",
+      "color": "#9f90be",
+      "mark": "02"
+    },
+    {
+      "name": "Deadpool",
+      "detail": "Also my gamer tag",
+      "color": "#e95153",
+      "mark": "03"
+    },
+    {
+      "name": "Goku & Vegeta",
+      "detail": "Dragon Ball",
+      "color": "#e9aa63",
+      "mark": "04"
+    },
+    {
+      "name": "Naruto",
+      "detail": "Naruto",
+      "color": "#efbb76",
+      "mark": "05"
+    },
+    {
+      "name": "Ichigo",
+      "detail": "Bleach",
+      "color": "#e69163",
+      "mark": "06"
+    }
+  ]
+}
