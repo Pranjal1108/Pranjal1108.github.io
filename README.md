@@ -2,7 +2,7 @@
 
 A React and Three.js portfolio with a scroll-guided flight past India Gate, Galgotias University's AI & Data Science Block, a project tower and a stationary Himalayan photographic backdrop.
 
-Deadpool reclines on the main extruded PRANJAL lettering. The site includes day/night lighting, a camera-motion control, reduced-motion support, project interactions and contact links. Other character models are not included.
+Sculpted red PRANJAL lettering introduces the about section. The site includes day/night lighting, a camera-motion control, reduced-motion support, project interactions and contact links. No character models are included.
 
 ## GitHub Pages
 
@@ -27,7 +27,6 @@ The GIT PUSHer workflow is an interactive explanation. The aim target is explici
 
 ## Assets and credits
 
-- Deadpool model: Sheharyar76, CC BY 4.0. https://sketchfab.com/3d-models/deadpool-fully-rigged-with-facial-rig-bb4be48749df43f0a6899aeabec1cbdd . Pose, materials and texture resolution adapted.
 - Himalayan photo: Eugene Ga, Unsplash License. https://unsplash.com/photos/infssQ2tjeM
 - Free Poliigon concrete 7856: https://www.poliigon.com/texture/large-matte-panel-with-tie-hole-concrete-texture/7856 . Used as part of the rendered scene; not a standalone texture distribution.
 - Poly Haven Industrial Sunset 02 Pure Sky HDRI, CC0: https://polyhaven.com/a/industrial_sunset_02_puresky

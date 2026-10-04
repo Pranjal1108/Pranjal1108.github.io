@@ -3,7 +3,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { createAtmosphere } from './atmosphere.js';
-import { createCharacters } from './characters.js';
+import { createNameDisplay } from './name-display.js';
 import routeData from './route.json';
 
 export const route=routeData;
@@ -67,7 +67,7 @@ export async function createFlight(container,{onReady,onError,isCancelled}){
  const reduced=matchMedia('(prefers-reduced-motion: reduce)'),story=document.querySelector('.flight-story');
  const materials=new Set(),textures=new Set(),look=new T.Vector3(),tangentA=new T.Vector3(),tangentB=new T.Vector3(),shadowCenter=new T.Vector3(9999,0,0);
  const warm=new T.Color('#ffdbad'),cool=new T.Color('#a6caff');
- const characters=createCharacters(scene,{wake,onStatus:states=>{container.dataset.characters=states.map(s=>s.name+':'+s.status).join(',');}});
+ const nameDisplay=createNameDisplay(scene,{wake,onStatus:states=>{container.dataset.nameDisplay=states.map(s=>s.name+':'+s.status).join(',');}});
  function setLighting(){
   scene.fog.color.set('#9badbb').lerp(new T.Color('#142c48'),night);nightUniform.value=night;atmosphere.setNight(night);starMaterial.opacity=night*.55;
   sun.color.copy(warm).lerp(cool,night);sun.intensity=T.MathUtils.lerp(3.1,1.25,night);
@@ -95,7 +95,7 @@ export async function createFlight(container,{onReady,onError,isCancelled}){
   camera.up.set(0,1,0);camera.lookAt(look);camera.rotateZ(bank);
   sky.position.copy(camera.position);stars.position.copy(camera.position);
   if(shadowCenter.distanceTo(camera.position)>18){shadowCenter.copy(camera.position);sun.target.position.copy(look);sun.position.copy(look).add(new T.Vector3(-90,145,55));renderer.shadowMap.needsUpdate=true;}
-  setLighting();characters.update(current,night);renderer.info.reset();renderer.info.autoReset=false;atmosphere.render(scene);characters.renderOverlay(renderer);
+  setLighting();nameDisplay.update(current,night);renderer.info.reset();renderer.info.autoReset=false;atmosphere.render(scene);nameDisplay.renderOverlay(renderer);
   container.dataset.progress=(current/(route.length-1)).toFixed(3);container.dataset.night=night.toFixed(3);container.dataset.bank=bank.toFixed(4);
   container.dataset.drawCalls=String(renderer.info.render.calls);container.dataset.triangles=String(renderer.info.render.triangles);
   if((enabled&&!reduced.matches&&Math.abs(current-target)>.00008)||Math.abs(night-nightTarget)>.001||travel>.003||Math.abs(bank)>.0001)wake();
@@ -135,7 +135,7 @@ export async function createFlight(container,{onReady,onError,isCancelled}){
   if(disposed)return;disposed=true;cancelAnimationFrame(frame);
   window.removeEventListener('scroll',scroll);window.removeEventListener('resize',resize);reduced.removeEventListener('change',resize);document.removeEventListener('visibilitychange',visibility);
   renderer.domElement.removeEventListener('webglcontextlost',contextLost);
-  characters.dispose();scene.traverse(o=>{o.geometry?.dispose();});materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());
+  nameDisplay.dispose();scene.traverse(o=>{o.geometry?.dispose();});materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());
   skyMaterial.dispose();mountainMaterial.dispose();starMaterial.dispose();environment?.dispose();sun.shadow.dispose();atmosphere.dispose();renderer.dispose();renderer.domElement.remove();
  }
  window.addEventListener('scroll',scroll,{passive:true});window.addEventListener('resize',resize);reduced.addEventListener('change',resize);document.addEventListener('visibilitychange',visibility);
