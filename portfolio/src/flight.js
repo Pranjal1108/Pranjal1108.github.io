@@ -1,7 +1,7 @@
 import * as T from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
-import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { createAtmosphere } from './atmosphere.js';
 import { createNameDisplay } from './name-display.js';
 import routeData from './route.json';
@@ -17,16 +17,17 @@ function pathTime(phase){
  const i=Math.min(knots.length-2,Math.max(0,knots.findLastIndex(k=>phase>=k.phase)));
  return (i+T.MathUtils.clamp((phase-knots[i].phase)/(knots[i+1].phase-knots[i].phase),0,1))/(knots.length-1);
 }
-export async function createFlight(container,{onReady,onError,isCancelled}){
+export async function createFlight(container,{onReady,onError,onProgress,isCancelled}){
  const renderer=new T.WebGLRenderer({antialias:false,powerPreference:'high-performance'});
  renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;
  renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.shadowMap.autoUpdate=false;
  renderer.domElement.style.opacity='0';container.appendChild(renderer.domElement);
  const scene=new T.Scene();scene.fog=new T.FogExp2('#142c48',.0018);const camera=new T.PerspectiveCamera(46,1,.25,1300);
- const atmosphere=createAtmosphere(renderer,camera);
+ const compact=innerWidth<700||navigator.connection?.saveData;
+ const atmosphere=createAtmosphere(renderer,camera,{compact});
  const fill=new T.HemisphereLight('#c3d9ff','#75604d',.7);
  const sun=new T.DirectionalLight('#ffdab0',3.8);
- sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);
+ sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);
  Object.assign(sun.shadow.camera,{left:-130,right:130,top:130,bottom:-130,near:1,far:400});
  sun.shadow.bias=-.00015;sun.shadow.normalBias=.12;scene.add(fill,sun,sun.target);
  const fixtures=[];
@@ -63,11 +64,11 @@ export async function createFlight(container,{onReady,onError,isCancelled}){
  const starMaterial=new T.PointsMaterial({color:'#d5e6ff',size:.65,transparent:true,opacity:.65,depthWrite:false});
  const stars=new T.Points(starGeometry,starMaterial);scene.add(stars);
  let disposed=false,frame=0,current=0,target=0,enabled=true,last=0,night=1,nightTarget=1,storyHeight=1,anchors=[],environment;
- let bank=0,travel=0,previousPhase=0;
+ let bank=0,travel=0,previousPhase=0,sceneDirty=true,sceneReady=false,firstFrame=true,frames=0,quality=1,slowFrames=0;
  const reduced=matchMedia('(prefers-reduced-motion: reduce)'),story=document.querySelector('.flight-story');
  const materials=new Set(),textures=new Set(),look=new T.Vector3(),tangentA=new T.Vector3(),tangentB=new T.Vector3(),shadowCenter=new T.Vector3(9999,0,0);
  const warm=new T.Color('#ffdbad'),cool=new T.Color('#a6caff');
- const nameDisplay=createNameDisplay(scene,{wake,onStatus:states=>{container.dataset.nameDisplay=states.map(s=>s.name+':'+s.status).join(',');}});
+ const nameDisplay=createNameDisplay(scene,{wake:()=>{sceneDirty=true;wake();},onStatus:states=>{container.dataset.nameDisplay=states.map(s=>s.name+':'+s.status).join(',');}});
  function setLighting(){
   scene.fog.color.set('#9badbb').lerp(new T.Color('#142c48'),night);nightUniform.value=night;atmosphere.setNight(night);starMaterial.opacity=night*.55;
   sun.color.copy(warm).lerp(cool,night);sun.intensity=T.MathUtils.lerp(3.1,1.25,night);
@@ -79,7 +80,9 @@ export async function createFlight(container,{onReady,onError,isCancelled}){
  function wake(){if(!frame&&!disposed&&!document.hidden)frame=requestAnimationFrame(draw);}
  function draw(now){
   frame=0;if(disposed||document.hidden)return;
-  const dt=Math.min((now-last)/1000||.016,.05);last=now;
+  const interval=now-last;const dt=Math.min(interval/1000||.016,.05);last=now;
+  const moving=(enabled&&!reduced.matches&&Math.abs(current-target)>.00008)||Math.abs(night-nightTarget)>.001||travel>.003||Math.abs(bank)>.0001;
+  if(!sceneDirty&&!moving){atmosphere.present(now);nameDisplay.update();nameDisplay.renderOverlay(renderer);container.dataset.frames=String(++frames);if(atmosphere.active(now))wake();return;}
   if(enabled&&!reduced.matches)current+=(target-current)*(1-Math.exp(-dt*5));
   night=reduced.matches?nightTarget:night+(nightTarget-night)*(1-Math.exp(-dt*6));
   const time=pathTime(current),delta=current-previousPhase;previousPhase=current;
@@ -95,10 +98,14 @@ export async function createFlight(container,{onReady,onError,isCancelled}){
   camera.up.set(0,1,0);camera.lookAt(look);camera.rotateZ(bank);
   sky.position.copy(camera.position);stars.position.copy(camera.position);
   if(shadowCenter.distanceTo(camera.position)>18){shadowCenter.copy(camera.position);sun.target.position.copy(look);sun.position.copy(look).add(new T.Vector3(-90,145,55));renderer.shadowMap.needsUpdate=true;}
-  setLighting();nameDisplay.update(current,night);renderer.info.reset();renderer.info.autoReset=false;atmosphere.render(scene);nameDisplay.renderOverlay(renderer);
+  setLighting();nameDisplay.update(current,night);renderer.info.reset();renderer.info.autoReset=false;atmosphere.render(scene,now);nameDisplay.renderOverlay(renderer);sceneDirty=false;
+  container.dataset.frames=String(++frames);
+  if(sceneReady&&firstFrame){firstFrame=false;onProgress?.(100);onReady();}
+  if(moving&&interval>28&&interval<180)slowFrames++;else slowFrames=Math.max(0,slowFrames-1);
+  if(slowFrames>30&&quality>.7){quality=.7;slowFrames=0;resize();}
   container.dataset.progress=(current/(route.length-1)).toFixed(3);container.dataset.night=night.toFixed(3);container.dataset.bank=bank.toFixed(4);
   container.dataset.drawCalls=String(renderer.info.render.calls);container.dataset.triangles=String(renderer.info.render.triangles);
-  if((enabled&&!reduced.matches&&Math.abs(current-target)>.00008)||Math.abs(night-nightTarget)>.001||travel>.003||Math.abs(bank)>.0001)wake();
+  if((enabled&&!reduced.matches&&Math.abs(current-target)>.00008)||Math.abs(night-nightTarget)>.001||travel>.003||Math.abs(bank)>.0001||atmosphere.active(now))wake();
  }
  function scroll(){
   const pageProgress=T.MathUtils.clamp(scrollY/Math.max(1,storyHeight-innerHeight),0,1);
@@ -120,16 +127,17 @@ export async function createFlight(container,{onReady,onError,isCancelled}){
   document.documentElement.style.setProperty('--nav-opacity',1);
   document.documentElement.style.setProperty('--nav-events','auto');
   const chapter=document.querySelectorAll('.flight-chapter')[index];
-  document.documentElement.style.setProperty('--shade-angle',chapter?.dataset.side==='right'?'270deg':'90deg');wake();
+  document.documentElement.style.setProperty('--shade-angle',chapter?.dataset.side==='right'?'270deg':'90deg');sceneDirty=true;wake();
  }
  function resize(){
   const w=container.clientWidth,h=container.clientHeight;
-  const ratio=Math.min(devicePixelRatio,1.75,Math.sqrt((w<700?900000:2400000)/(w*h)));
+  const ratio=Math.min(devicePixelRatio,1.5,Math.sqrt((compact?650000:1500000)/(w*h)))*quality;
   renderer.setPixelRatio(ratio);renderer.setSize(w,h,false);atmosphere.resize(Math.floor(w*ratio),Math.floor(h*ratio));
+  container.dataset.renderPixels=String(Math.floor(w*ratio)*Math.floor(h*ratio));container.dataset.quality=String(quality);
   camera.aspect=w/h;camera.fov=w<700?62:46;camera.updateProjectionMatrix();storyHeight=story.offsetHeight;
   anchors=[...document.querySelectorAll('.flight-chapter')].map(e=>e.offsetTop);anchors.push(Math.max(anchors.at(-1)+1,storyHeight-innerHeight));scroll();
  }
- const visibility=()=>{last=0;wake();};
+ const visibility=()=>{last=0;if(document.hidden){cancelAnimationFrame(frame);frame=0;atmosphere.clearRipples();}else{sceneDirty=true;wake();}};
  const contextLost=e=>{e.preventDefault();renderer.domElement.style.opacity='0';onError();};
  function dispose(){
   if(disposed)return;disposed=true;cancelAnimationFrame(frame);
@@ -141,42 +149,37 @@ export async function createFlight(container,{onReady,onError,isCancelled}){
  window.addEventListener('scroll',scroll,{passive:true});window.addEventListener('resize',resize);reduced.addEventListener('change',resize);document.addEventListener('visibilitychange',visibility);
  renderer.domElement.addEventListener('webglcontextlost',contextLost);resize();
  try{
+  let completed=0;const task=promise=>promise.then(value=>{onProgress?.(15+(++completed/6)*60);return value;});
   const loader=new T.TextureLoader();
   const [maps,gltf,hdr,photo]=await Promise.all([
    Promise.all(['concrete-color','concrete-normal','concrete-roughness'].map(async name=>{
-    const map=await loader.loadAsync('/assets/materials/'+name+'.webp');textures.add(map);map.wrapS=map.wrapT=T.RepeatWrapping;
+    const map=await task(loader.loadAsync('/assets/materials/'+name+'.webp'));textures.add(map);map.wrapS=map.wrapT=T.RepeatWrapping;
     map.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());if(name.endsWith('color'))map.colorSpace=T.SRGBColorSpace;return map;
-   })),new GLTFLoader().loadAsync('/assets/north-india.glb'),new HDRLoader().loadAsync('/assets/sunset.hdr'),loader.loadAsync('/assets/himalayas.jpg')]);
+   })),task(new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync('/assets/north-india.glb')),task(new HDRLoader().loadAsync('/assets/sunset.hdr')),task(loader.loadAsync('/assets/himalayas.webp'))]);
   textures.add(hdr);textures.add(photo);photo.colorSpace=T.SRGBColorSpace;
   if(isCancelled()){gltf.scene.traverse(o=>{o.geometry?.dispose();if(o.isMesh)(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>m.dispose());});dispose();return {dispose,setMotion(){},setTheme(){}};}
+  onProgress?.(80);
   const pmrem=new T.PMREMGenerator(renderer);environment=pmrem.fromEquirectangular(hdr);scene.environment=environment.texture;pmrem.dispose();
   mountainMaterial.uniforms.photo.value=photo;mountainMaterial.uniforms.photoReady.value=1;
-  gltf.scene.updateMatrixWorld(true);const batches=new Map(),originals=new Set();
+  // Geometry, planar UVs, and material batches are prepared offline.
   gltf.scene.traverse(o=>{
-   if(!o.isMesh)return;originals.add(o.geometry);if(/^(Manali|Distant Himalayan)/.test(o.name))return;
-   const source=o.geometry.index?o.geometry.toNonIndexed():o.geometry.clone();source.applyMatrix4(o.matrixWorld);
-   const list=Array.isArray(o.material)?o.material:[o.material];
-   const groups=Array.isArray(o.material)?source.groups:[{start:0,count:source.attributes.position.count,materialIndex:0}];
-   for(const group of groups){
-    const m=list[group.materialIndex];materials.add(m);
+   if(!o.isMesh)return;o.castShadow=o.receiveShadow=true;
+   for(const m of Array.isArray(o.material)?o.material:[o.material]){
+    materials.add(m);
     if(m.name==='Campus limestone'||m.name==='Delhi sandstone'){
      m.color.set(m.name==='Delhi sandstone'?'#c7a079':'#e7ddc6');m.map=maps[0];m.normalMap=maps[1];m.roughnessMap=maps[2];m.normalScale.set(.8,.8);m.roughness=.9;
     }
     if(/metal|bronze/i.test(m.name)){m.metalness=.85;m.roughness=.38;}
     if(m.name==='Architectural blue glass'){m.color.set('#7399b0');m.metalness=.7;m.roughness=.22;}
-    const g=new T.BufferGeometry();
-    for(const attr of ['position','normal']){const a=source.attributes[attr];g.setAttribute(attr,new T.BufferAttribute(a.array.slice(group.start*a.itemSize,(group.start+group.count)*a.itemSize),a.itemSize));}
-    const p=g.attributes.position,n=g.attributes.normal,uv=[],scale=m.name==='Himalayan rock'?14:2.5;
-    for(let i=0;i<p.count;i++){
-     const nx=Math.abs(n.getX(i)),ny=Math.abs(n.getY(i)),nz=Math.abs(n.getZ(i));
-     if(ny>nx&&ny>nz)uv.push(p.getX(i)/scale,p.getZ(i)/scale);else if(nx>nz)uv.push(p.getZ(i)/scale,p.getY(i)/scale);else uv.push(p.getX(i)/scale,p.getY(i)/scale);
-    }
-    g.setAttribute('uv',new T.Float32BufferAttribute(uv,2));if(!batches.has(m))batches.set(m,[]);batches.get(m).push(g);
-   }source.dispose();
+   }
   });
-  for(const [m,geometries] of batches){const merged=mergeGeometries(geometries,false);if(!merged)throw Error('Geometry batching failed');merged.computeBoundingSphere();const mesh=new T.Mesh(merged,m);mesh.castShadow=mesh.receiveShadow=true;scene.add(mesh);geometries.forEach(g=>g.dispose());}
-  originals.forEach(g=>g.dispose());renderer.shadowMap.needsUpdate=true;
-  renderer.domElement.style.opacity='1';container.dataset.loaded='true';container.dataset.materials='Poliigon concrete 7856 / HDR sunset / Himalayan photograph';onReady();wake();
+  scene.add(gltf.scene);renderer.shadowMap.needsUpdate=true;
+  hdr.dispose();textures.delete(hdr);
+  onProgress?.(88);await nameDisplay.ready;
+  if(isCancelled()){dispose();return {dispose,setMotion(){},setTheme(){}};}
+  await renderer.compileAsync(scene,camera);onProgress?.(96);
+  sceneReady=true;sceneDirty=true;
+  renderer.domElement.style.opacity='1';container.dataset.loaded='true';container.dataset.materials='Poliigon concrete 7856 / HDR sunset / Himalayan photograph';wake();
  }catch(e){dispose();onError();throw e;}
- return {dispose,setMotion(value){enabled=value;wake();},setTheme(value){nightTarget=value==='night'?1:0;wake();}};
+ return {dispose,ripple(x,y,strength){if(!enabled||reduced.matches||document.hidden||!sceneReady)return;atmosphere.ripple(x,y,strength,performance.now());wake();},setMotion(value){enabled=value;if(!value)atmosphere.clearRipples();sceneDirty=true;wake();},setTheme(value){nightTarget=value==='night'?1:0;sceneDirty=true;wake();}};
 }

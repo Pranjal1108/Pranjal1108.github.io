@@ -3,22 +3,23 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { FullScreenQuad } from 'three/addons/postprocessing/Pass.js';
 
-export function createAtmosphere(renderer,camera){
+export function createAtmosphere(renderer,camera,{compact=false}={}){
  let seed=581;
  const bytes=new Uint8Array(64*64*64);
  for(let i=0;i<bytes.length;i++){seed=(seed*1664525+1013904223)>>>0;bytes[i]=seed>>>24;}
  const noise=new T.Data3DTexture(bytes,64,64,64);
  noise.format=T.RedFormat;noise.minFilter=noise.magFilter=T.LinearFilter;
  noise.wrapS=noise.wrapT=noise.wrapR=T.RepeatWrapping;noise.needsUpdate=true;
- const sceneTarget=new T.WebGLRenderTarget(1,1,{type:T.HalfFloatType,samples:2});
+ const sceneTarget=new T.WebGLRenderTarget(1,1,{type:T.HalfFloatType,samples:compact?0:2});
  sceneTarget.depthTexture=new T.DepthTexture(1,1);sceneTarget.depthTexture.type=T.UnsignedIntType;
  const cloudTarget=new T.WebGLRenderTarget(1,1,{type:T.HalfFloatType,depthBuffer:false});
  const blurTarget=cloudTarget.clone(),cleanCloudTarget=cloudTarget.clone();
  const inverse=new T.Matrix4();
  const uniforms={depth:{value:sceneTarget.depthTexture},noiseVolume:{value:noise},inverseVP:{value:inverse},eye:{value:camera.position},night:{value:1}};
  const vertex='varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}';
- const cloudMaterial=new T.ShaderMaterial({uniforms,depthTest:false,depthWrite:false,vertexShader:vertex,fragmentShader:`
+ const cloudMaterial=new T.ShaderMaterial({defines:{STEPS:compact?40:48},uniforms,depthTest:false,depthWrite:false,vertexShader:vertex,fragmentShader:`
  precision highp sampler3D;
  varying vec2 vUv;uniform sampler2D depth;uniform sampler3D noiseVolume;
  uniform mat4 inverseVP;uniform vec3 eye;uniform float night;
@@ -41,10 +42,10 @@ export function createAtmosphere(renderer,camera){
   float a=(61.-eye.y)/ray.y,b=(4.-eye.y)/ray.y;
   float start=max(0.,min(a,b)),finish=min(stop,min(800.,max(a,b)));
   if(finish<=start){gl_FragColor=vec4(0.);return;}
-  float stepLength=(finish-start)/64.;vec4 sum=vec4(0.);float jitter=fract(sin(dot(gl_FragCoord.xy,vec2(12.9898,78.233)))*43758.5453);
+  float stepLength=(finish-start)/float(STEPS);vec4 sum=vec4(0.);float jitter=fract(sin(dot(gl_FragCoord.xy,vec2(12.9898,78.233)))*43758.5453);
   vec3 lightDir=normalize(vec3(-.5,.8,.3));
   float forward=pow(max(0.,dot(ray,lightDir)),5.);
-  for(int i=0;i<64;i++){
+  for(int i=0;i<STEPS;i++){
    vec3 p=eye+ray*(start+(float(i)+jitter)*stepLength);float d=density(p);
    if(d>.012){
     float shadow=density(p+lightDir*4.)*.65+density(p+lightDir*10.)*.35;
@@ -78,20 +79,49 @@ export function createAtmosphere(renderer,camera){
  composer.setPixelRatio(1);
  const bloom=new UnrealBloomPass(new T.Vector2(1,1),1.15,.85,.85);
  const output=new OutputPass();composer.addPass(composite);composer.addPass(bloom);composer.addPass(output);
+ // Keep the expensive scene/cloud/bloom image. Pointer motion only refracts
+ // this cached image, instead of ray-marching the clouds again each frame.
+ composer.renderToScreen=false;
+ const waves=Array.from({length:6},()=>new T.Vector4(0,0,-10,0));let waveIndex=0;
+ const liquidMaterial=new T.ShaderMaterial({depthTest:false,depthWrite:false,toneMapped:false,
+  uniforms:{image:{value:null},waves:{value:waves},clock:{value:0},aspect:{value:1}},vertexShader:vertex,fragmentShader:`
+ varying vec2 vUv;uniform sampler2D image;uniform vec4 waves[6];uniform float clock,aspect;
+ void main(){
+  vec2 offset=vec2(0.);float sheen=0.;
+  for(int i=0;i<6;i++){
+   float age=clock-waves[i].z;
+   if(age<0.||age>1.2||waves[i].w==0.)continue;
+   vec2 delta=(vUv-waves[i].xy)*vec2(aspect,1.);float distance=length(delta);
+   float radius=.018+age*.29;
+   float front=(distance-radius)/.027;
+   float envelope=exp(-front*front)*pow(1.-age/1.2,2.)*waves[i].w;
+   vec2 direction=delta/max(distance,.001)/vec2(aspect,1.);
+   offset+=direction*sin(front*2.6)*envelope*.018;
+   sheen+=cos(front*2.6)*envelope*.065;
+  }
+  vec3 color=texture2D(image,clamp(vUv+offset,vec2(.001),vec2(.999))).rgb;
+  gl_FragColor=vec4(color+vec3(.55,.76,1.)*sheen,1.);
+ }`});
+ const liquidQuad=new FullScreenQuad(liquidMaterial);
+ function present(now){liquidMaterial.uniforms.clock.value=now/1000;liquidMaterial.uniforms.image.value=composer.readBuffer.texture;renderer.setRenderTarget(null);liquidQuad.render(renderer);}
  const screen=new T.Scene(),ortho=new T.OrthographicCamera(-1,1,1,-1,0,1);
  const quad=new T.Mesh(new T.PlaneGeometry(2,2),cloudMaterial);screen.add(quad);
  return {
-  resize(w,h){sceneTarget.setSize(w,h);cloudTarget.setSize(Math.max(1,Math.round(w*.6)),Math.max(1,Math.round(h*.6)));blurTarget.setSize(cloudTarget.width,cloudTarget.height);cleanCloudTarget.setSize(cloudTarget.width,cloudTarget.height);composer.setSize(w,h);},
+  resize(w,h){const scale=compact?.4:.45;sceneTarget.setSize(w,h);cloudTarget.setSize(Math.max(1,Math.round(w*scale)),Math.max(1,Math.round(h*scale)));blurTarget.setSize(cloudTarget.width,cloudTarget.height);cleanCloudTarget.setSize(cloudTarget.width,cloudTarget.height);composer.setSize(w,h);liquidMaterial.uniforms.aspect.value=w/h;},
+  ripple(x,y,strength,now){waves[waveIndex++%waves.length].set(x,1-y,now/1000,strength);},
+  active(now){return waves.some(w=>w.w>0&&now/1000-w.z<1.2);},
+  clearRipples(){waves.forEach(w=>w.w=0);},
+  present,
   setNight(v){uniforms.night.value=v;bloom.strength=T.MathUtils.lerp(.18,.32,v);bloom.threshold=T.MathUtils.lerp(1.4,1.2,v);},
-  render(scene){
+  render(scene,now){
    camera.updateMatrixWorld();inverse.multiplyMatrices(camera.matrixWorld,camera.projectionMatrixInverse);
    renderer.setRenderTarget(sceneTarget);renderer.render(scene,camera);
    quad.material=cloudMaterial;renderer.setRenderTarget(cloudTarget);renderer.render(screen,ortho);
    quad.material=cleanMaterial;cleanMaterial.uniforms.image.value=cloudTarget.texture;cleanMaterial.uniforms.direction.value.set(1/cloudTarget.width,0);renderer.setRenderTarget(blurTarget);renderer.render(screen,ortho);
    cleanMaterial.uniforms.image.value=blurTarget.texture;cleanMaterial.uniforms.direction.value.set(0,1/cloudTarget.height);renderer.setRenderTarget(cleanCloudTarget);renderer.render(screen,ortho);
-   renderer.setRenderTarget(null);composer.render();
+   renderer.setRenderTarget(null);composer.render();present(now);
   },
-  dispose(){sceneTarget.dispose();cloudTarget.dispose();blurTarget.dispose();cleanCloudTarget.dispose();cleanMaterial.dispose();noise.dispose();quad.geometry.dispose();cloudMaterial.dispose();composite.dispose();bloom.dispose();output.dispose();composer.dispose();}
+  dispose(){sceneTarget.dispose();cloudTarget.dispose();blurTarget.dispose();cleanCloudTarget.dispose();cleanMaterial.dispose();noise.dispose();quad.geometry.dispose();cloudMaterial.dispose();composite.dispose();bloom.dispose();output.dispose();composer.dispose();liquidQuad.dispose();liquidMaterial.dispose();}
  };
 }
 

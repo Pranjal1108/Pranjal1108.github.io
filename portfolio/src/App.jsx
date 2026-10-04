@@ -1,43 +1,59 @@
-import React,{useEffect,useRef,useState} from 'react';
-import {ArrowUpRight,ArrowDown,Pause,Play,Sun,Moon} from 'lucide-react';
+import React, {useEffect, useRef, useState, lazy, Suspense} from 'react';
+import {ArrowUpRight, ArrowRight, Plus, Minus, Pause, Play, Menu, X, Sun, Moon} from 'lucide-react';
+import {ScrollTrigger} from 'gsap/ScrollTrigger';
 import data from './portfolio.json';
-import {GitWorkflow,AimPreview,JobSource,AirportChart} from './ProjectVisuals.jsx';
-const visuals=[GitWorkflow,AimPreview,JobSource,AirportChart];
-const summaries=['From a project folder to a GitHub repository.','A faster aim starts with one target.','Connecting job seekers with their next opportunity.','Turning airport development data into a clearer picture.'];
-const projectLinks=['https://github.com/Pranjal1108/git-pusher',null,'https://github.com/Pranjal1108/Online-Job-Portal','https://github.com/Pranjal1108/DataAnalytics'];
-function Chapter({id,side='left',label,children,className='',visual}){
- return <section id={id} data-side={side} className={'flight-chapter '+className}><div className="chapter-frame"><div className={'chapter-layout '+(visual?'with-visual':'')}><article className={'scene-copy '+side}>{children}</article>{visual}</div>{label&&<span className="place-note">{label}</span>}</div></section>;
+import {useChoreography} from './motion.js';
+const SpatialScene = lazy(()=>import('./SpatialScene.jsx'));
+const categories=['Developer tooling','Interactive systems','Web applications','Data & visualization'];
+const summaries=['Less setup. More shipping.','Precision, built into play.','A better path to the next role.','Complex data. Clearer decisions.'];
+const projectLinks=[data.projects[0].url,null,'https://github.com/Pranjal1108/Online-Job-Portal','https://github.com/Pranjal1108/DataAnalytics'];
+
+function SceneIsland({mode='sculpture',motion,theme}) {
+ const host=useRef(null); const [near,setNear]=useState(mode==='sculpture');
+ useEffect(()=>{const observer=new IntersectionObserver(entries=>{if(entries[0].isIntersecting){setNear(true);observer.disconnect();}},{rootMargin:'300px'});observer.observe(host.current);return()=>observer.disconnect();},[]);
+ return <div ref={host} className={'scene-island '+mode}>
+  <img className="scene-poster" src={'/assets/'+mode+(theme==='dark'?'-dark':'')+'-poster.webp'} alt="" aria-hidden="true" width="1200" height="1000" loading={mode==='sculpture'?'eager':'lazy'}/>
+  {near&&<Suspense fallback={null}><SpatialScene mode={mode} motion={motion} theme={theme}/></Suspense>}
+ </div>;
 }
-export default function App(){
- const mount=useRef(null),engine=useRef(null),motionRef=useRef(true),themeRef=useRef('night');
- const [ready,setReady]=useState(false),[failed,setFailed]=useState(false),[motion,setMotion]=useState(true);
- const [theme,setTheme]=useState(()=>{try{return localStorage.getItem('portfolio-scene-theme')||'night';}catch{return 'night';}});
- useEffect(()=>{let cancelled=false;import('./flight.js').then(async({createFlight})=>{
-  if(cancelled)return;try{const next=await createFlight(mount.current,{onReady:()=>!cancelled&&setReady(true),onError:()=>!cancelled&&setFailed(true),isCancelled:()=>cancelled});
-  if(cancelled){next?.dispose();return;}engine.current=next;next.setMotion(motionRef.current);next.setTheme(themeRef.current);
-  }catch{if(!cancelled)setFailed(true);}}).catch(()=>{if(!cancelled)setFailed(true);});
-  return()=>{cancelled=true;engine.current?.dispose();};
- },[]);
- useEffect(()=>{motionRef.current=motion;engine.current?.setMotion(motion);},[motion]);
- useEffect(()=>{themeRef.current=theme;engine.current?.setTheme(theme);try{localStorage.setItem('portfolio-scene-theme',theme);}catch{}},[theme]);
- return <main data-theme={theme} className={'portfolio '+(failed?'scene-fallback':'')}>
-  <a className="skip" href="#about">Skip to content</a>
-  <div className="world" ref={mount} aria-hidden="true"/><div className="film-shade" aria-hidden="true"/><div className="aperture-veil" aria-hidden="true"/>
-  <header className="masthead"><a className="identity" href="#intro">PS<span>Pranjal Saini</span></a>
-   <nav aria-label="Portfolio"><a className="wide-nav" href="#about">About</a><a href="#education">Education</a><a href="#project-0">Work</a><a className="wide-nav" href="#skills">Skills</a><a href="#contact">Contact <ArrowUpRight/></a></nav>
-   <button className="theme-toggle" aria-label={theme==='day'?'Switch to night':'Switch to day'} onClick={()=>setTheme(theme==='day'?'night':'day')}>{theme==='day'?<Moon/>:<Sun/>}<span>{theme==='day'?'Night':'Day'}</span></button>
-   <button className="motion-toggle" aria-label={motion?'Disable camera motion':'Enable camera motion'} aria-pressed={!motion} onClick={()=>setMotion(!motion)}>{motion?<Pause/>:<Play/>}</button>
+function Project({project,index}) {
+ const [expanded,setExpanded]=useState(false);
+ return <article className={'project project-'+index} id={'project-'+index}>
+  <div className="project-heading"><span className="project-index">{String(index+1).padStart(2,'0')}</span><span>{categories[index]}</span></div>
+  <div className="project-composition"><div className="project-copy"><h3>{project.name}</h3><p className="project-lead">{summaries[index]}</p><p className="project-tech">{project.tech}</p>
+   <button className="detail-toggle" aria-expanded={expanded} aria-controls={'detail-'+index} onClick={()=>{setExpanded(!expanded);setTimeout(()=>ScrollTrigger.refresh(),350);}}>Project details {expanded?<Minus/>:<Plus/>}</button>
+   <div id={'detail-'+index} className="project-details" hidden={!expanded}>{project.points.map(point=><p key={point}>{point}</p>)}</div>
+   {projectLinks[index]&&<a className="source-link magnetic" href={projectLinks[index]} target="_blank" rel="noopener noreferrer">View source <ArrowUpRight/></a>}
+  </div></div>
+ </article>;
+}
+export default function App() {
+ const root=useRef(null);
+ const [motion,setMotion]=useState(()=>!window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+ const [menu,setMenu]=useState(false);
+ const [theme,setTheme]=useState(()=>{try{return localStorage.getItem('portfolio-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');}catch{return 'light';}});
+ useEffect(()=>{document.documentElement.dataset.theme=theme;document.querySelector('meta[name="theme-color"]')?.setAttribute('content',theme==='dark'?'#171c17':'#e8e9e2');try{localStorage.setItem('portfolio-theme',theme);}catch{}},[theme]);
+ useEffect(()=>{const media=matchMedia('(prefers-reduced-motion: reduce)');const change=()=>setMotion(!media.matches);media.addEventListener('change',change);return()=>media.removeEventListener('change',change);},[]);
+ useEffect(()=>{const close=e=>{if(e.key==='Escape')setMenu(false);};window.addEventListener('keydown',close);return()=>window.removeEventListener('keydown',close);},[]);
+ useChoreography(root,motion);
+ return <main ref={root} data-theme={theme} className={'portfolio '+(!motion?'motion-paused':'')}>
+  <a className="skip" href="#work">Skip to content</a>
+  <header className="masthead"><a href="#intro" className="identity" aria-label="Pranjal Saini, home">pranjal<span className="identity-star">✳</span></a>
+   <nav id="mobile-nav" aria-label="Main navigation" className={menu?'is-open':''}><a href="#work" onClick={()=>setMenu(false)}>Work</a><a href="#about" onClick={()=>setMenu(false)}>About</a><a href="#contact" onClick={()=>setMenu(false)}>Contact <ArrowUpRight/></a></nav>
+   <div className="nav-controls"><button className="theme-toggle" onClick={()=>setTheme(theme==='dark'?'light':'dark')} aria-label={theme==='dark'?'Switch to light mode':'Switch to dark mode'} aria-pressed={theme==='dark'}>{theme==='dark'?<Sun/>:<Moon/>}</button><button className="motion-toggle" onClick={()=>setMotion(!motion)} aria-label={motion?'Pause animations':'Enable animations'} aria-pressed={!motion}>{motion?<Pause/>:<Play/>}</button><button className="menu-toggle" aria-expanded={menu} aria-controls="mobile-nav" aria-label={menu?'Close menu':'Open menu'} onClick={()=>setMenu(!menu)}>{menu?<X/>:<Menu/>}</button></div>
   </header>
-  <div className="flight-story">
-   <section className="flight-chapter opening" data-side="left" id="intro"><div className="chapter-frame"><div className="intro-type"><p className="eyebrow">Pranjal Saini / Portfolio</p><h1>A different<br/>point of view.</h1><p className="intro-description">Come for the journey.<br/>Stay for what I’m building.</p><a href="#about" className="primary-link">Come along <ArrowDown/></a><a href="#project-0" className="quiet-link">Or go straight to my work <ArrowUpRight/></a></div><span className="opening-location">A flight through my world</span></div></section>
-   <section className="flight-chapter about-chapter" data-side="left" id="about"><div className="chapter-frame"><div className="about-layout"><div className="name-stage" role="img" aria-label="Sculpted red letters spelling Pranjal"><h2 className="name-fallback">PRANJAL</h2></div><article className="about-copy"><p className="eyebrow">Meet the person behind the code</p><h2>A little about me.</h2><p className="role">{data.role}</p><p>{data.about}</p><a className="scene-link" href="#education">Where I’m learning <ArrowDown/></a></article></div></div></section>
-   <Chapter id="education" label="Galgotias University, Greater Noida"><p className="eyebrow">Education</p><h2>Where it<br/>takes shape.</h2><div className="resume-list">{data.education.map(e=><div className="resume-row" key={e.name}><h3>{e.name}</h3><p>{e.degree.replace('—',',')}</p><small>{e.meta}</small></div>)}</div><a className="scene-link" href="#certifications">Beyond the classroom <ArrowDown/></a></Chapter>
-   <Chapter id="certifications" side="right" className="certifications-chapter"><h2>Still curious.</h2><p className="body-copy">Learning beyond the degree.</p><div className="resume-list compact">{data.certifications.map(c=><div className="resume-row" key={c.name}><h3>{c.name}</h3><p>{c.issuer}</p></div>)}</div><a className="scene-link" href="#project-0">See what I’ve built <ArrowUpRight/></a></Chapter>
-   {data.projects.map((p,i)=>{const Visual=visuals[i];return <Chapter id={'project-'+i} side="left" key={p.name} className={'work-chapter project-'+i} visual={<Visual/>}>{i===0&&<p className="eyebrow">Selected work</p>}<h2>{p.name}</h2><p className="project-summary">{summaries[i]}</p><p className="project-tech">{p.tech.replaceAll(' · ', ' / ')}</p><div className="project-description">{p.points.map(t=><p key={t}>{t}</p>)}</div>{projectLinks[i]?<a className="primary-link" href={projectLinks[i]} target="_blank" rel="noopener noreferrer">Explore the source <ArrowUpRight/></a>:<a className="scene-link" href="#project-2">Next project <ArrowDown/></a>}</Chapter>;})}
-   <Chapter id="skills" className="skills-chapter"><h2>What I work with.</h2><div className="skills-layout">{data.skills.map(g=><div className="skill-group" id={g.name==='Concepts'?'approach':undefined} key={g.name}><h3>{g.name}</h3><p>{g.items.join(', ')}</p></div>)}</div><a href="#contact" className="scene-link">Let’s connect <ArrowDown/></a></Chapter>
-   <Chapter id="contact" className="contact-chapter"><p className="eyebrow">You’ve reached the next chapter</p><h2>Let’s build<br/>something.</h2><p className="body-copy">{data.contact}</p><a className="contact-email" href={data.links[0].href}>Email me <ArrowUpRight/></a><div className="contact-links">{data.links.slice(1).map(l=><a key={l.href} href={l.href} target="_blank" rel="noopener noreferrer">{l.name}<ArrowUpRight/></a>)}</div><div className="contact-bottom"><p>© 2026 Pranjal Saini</p><a href="#intro">Back to the beginning ↑</a></div><details className="asset-credits"><summary>Scene credits</summary><p><a href="https://unsplash.com/photos/infssQ2tjeM" target="_blank" rel="noreferrer">Himalayan photograph by Eugene Ga</a></p></details></Chapter>
-  </div>
-  <p className="sr-only" role="status">{failed?'The 3D view could not load. All portfolio content is available.':ready?'The flight is ready. Scroll to travel.':'Loading the scene. Portfolio content is available.'}</p>
+  <section className="hero" id="intro">
+   <div className="hero-art"><SceneIsland motion={motion} theme={theme}/></div>
+   <div className="hero-copy"><p className="hero-role">Software developer & CS student</p><h1><span className="text-mask"><span>Ideas into</span></span><span className="text-mask"><span>something<span className="heading-period">.</span></span></span></h1><p className="hero-description">Thoughtful software. Playful exploration.<br/>Built with purpose, from the ground up.</p><a href="#work" className="round-link magnetic"><span>Explore my work</span><span className="round-arrow"><ArrowUpRight/></span></a></div>
+   <div className="hero-bottom"><span>Pranjal Saini</span><span>Code with intention.</span></div>
+  </section>
+  <section className="statement section-space"><p className="statement-copy reveal">Good software starts<br/>with <span>a better question.</span></p><div className="statement-bottom"><p>I turn problems into practical tools, connected applications, and experiences you can interact with.</p><a className="line-link" href="#about">The person behind the work <ArrowRight/></a></div></section>
+  <section id="work" className="work section-space"><div className="work-layout"><div className="work-intro"><span className="section-label">Selected work</span><h2>Made to<br/> do more.</h2><p>Four projects.<br/>Different problems.<br/>One curious mind.</p><a className="line-link" href={data.links[2].href} target="_blank" rel="noopener noreferrer">All repositories <ArrowUpRight/></a></div><div className="projects">{data.projects.map((project,index)=><Project key={project.name} project={project} index={index}/>)}</div></div></section>
+  <section className="field-section" aria-labelledby="field-title"><div className="field-title"><h2 id="field-title" className="reveal">A little curiosity.<br/>A different dimension.</h2><p>Move through the field. Tap to make a wave.</p></div><div className="field-art"><SceneIsland mode="field" motion={motion} theme={theme}/></div><p className="field-end" aria-hidden="true">Build.<br/>Learn.<br/>Repeat.</p></section>
+  <section id="about" className="about section-space"><div className="about-top"><span className="section-label">A work in progress</span><h2 className="reveal">Always building.<br/><span>Always learning.</span></h2></div><div className="about-body"><p className="about-intro">I’m Pranjal, a Computer Science student at Galgotias University, exploring the space between an idea and a working application.</p><div><p>My projects span Python tools, Java applications, data visualization, and interactive systems. Right now, I’m learning computer automation with PyAutoGUI, OpenCV, and Selenium.</p><p>I care about clear thinking, clean structure, and making things that are useful to someone.</p></div></div>
+   <div className="background-grid"><div className="education"><h3>Education</h3>{data.education.map(item=><div className="education-item" key={item.name}><h4>{item.name}</h4><p>{item.degree}</p><small>{item.meta}</small></div>)}</div><div className="certifications"><h3>Beyond the classroom</h3>{data.certifications.map(item=><div className="cert-row" key={item.name}><span>{item.name}</span><span>{item.issuer}</span></div>)}</div></div>
+  </section>
+  <section id="skills" className="skills section-space"><h2>Tools of<br/><span>the practice.</span></h2><div className="skills-list">{data.skills.map(group=><div className="skill-row" key={group.name}><h3>{group.name}</h3><p>{group.items.join(' / ')}</p><ArrowUpRight aria-hidden="true"/></div>)}</div></section>
+  <footer id="contact" className="contact section-space"><div className="contact-top"><p>Have something in mind?</p><span>Open to opportunities & collaboration</span></div><a className="contact-title magnetic" href={data.links[0].href}>Let’s make<br/>it happen.<ArrowUpRight/></a><a href={data.links[0].href} className="email-link">pranjalsaini3030@gmail.com <ArrowUpRight/></a><div className="footer-bottom"><a href="#intro" className="identity">pranjal<span className="identity-star">✳</span></a><div className="social-links">{data.links.slice(1).map(link=><a href={link.href} key={link.name} target="_blank" rel="noopener noreferrer">{link.name}<ArrowUpRight/></a>)}</div><div className="footer-info"><span>© {new Date().getFullYear()} Pranjal Saini</span><span>This website is vibe coded.</span></div></div></footer>
  </main>;
 }
-

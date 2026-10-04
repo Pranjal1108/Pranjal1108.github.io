@@ -11,7 +11,7 @@ export function createNameDisplay(scene,{wake,onStatus}){
  key.shadow.mapSize.set(1024,1024);Object.assign(key.shadow.camera,{left:-5,right:5,top:4,bottom:-3,near:.1,far:25});key.shadow.normalBias=.015;
  overlay.add(key,key.target);const rim=new T.DirectionalLight('#aecbff',2.4);rim.position.set(5,3,-2);overlay.add(rim);
  let disposed=false,ready=false,visible=false,viewport=null;
- Promise.all([new FontLoader().loadAsync('/assets/characters/helvetiker_bold.typeface.json'),new T.TextureLoader().loadAsync('/assets/materials/concrete-color.webp')]).then(([font,texture])=>{
+ const readyPromise=Promise.all([new FontLoader().loadAsync('/assets/characters/helvetiker_bold.typeface.json'),new T.TextureLoader().loadAsync('/assets/materials/concrete-color.webp')]).then(([font,texture])=>{
   if(disposed){texture.dispose();return;}
   texture.colorSpace=T.SRGBColorSpace;texture.wrapS=texture.wrapT=T.RepeatWrapping;texture.repeat.set(2.5,2.5);
   const front=new T.MeshStandardMaterial({color:'#c63a45',map:texture,roughness:.65,metalness:.15,emissive:'#5d1018',emissiveIntensity:.22});
@@ -23,7 +23,7 @@ export function createNameDisplay(scene,{wake,onStatus}){
   composition.rotation.y=-.12;composition.rotation.x=.015;
   ready=true;stage.dataset.loaded='true';onStatus?.([{name:'name-display',status:'ready'}]);wake();
  }).catch(e=>{onStatus?.([{name:'name-display',status:'failed'}]);console.error('Name display:',e);});
- return {update(){if(!stage)return;const r=stage.getBoundingClientRect();visible=ready&&r.bottom>80&&r.top<innerHeight&&r.width>0;viewport=r;},
+ return {ready:readyPromise,update(){if(!stage)return;const r=stage.getBoundingClientRect();visible=ready&&r.bottom>80&&r.top<innerHeight&&r.width>0;viewport=r;},
   renderOverlay(renderer){if(!visible||!viewport)return;
    const r=viewport,oldViewport=renderer.getViewport(new T.Vector4()),oldScissor=renderer.getScissor(new T.Vector4()),oldTest=renderer.getScissorTest(),auto=renderer.autoClear;
    const aspect=r.width/r.height;camera.left=-3.25;camera.right=3.25;camera.top=3.25/aspect;camera.bottom=-3.25/aspect;camera.updateProjectionMatrix();

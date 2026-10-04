@@ -1,19 +1,22 @@
 {
-  "name": "pranjal-cinematic-portfolio",
-  "version": "0.2.0",
+  "name": "pranjal-portfolio",
   "private": true,
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite --config vite.config.js",
-    "build": "node scripts/build.mjs"
+    "build": "node scripts/build.mjs",
+    "preview": "vite preview --config vite.config.js --host 127.0.0.1"
   },
   "dependencies": {
-    "react": "19.3.0",
-    "react-dom": "19.3.0",
-    "three": "0.180.0",
-    "lucide-react": "0.468.0"
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "three": "^0.180.0",
+    "gsap": "^3.13.0",
+    "lucide-react": "^0.468.0",
+    "@fontsource-variable/manrope": "^5.2.0"
   },
   "devDependencies": {
-    "vite": "7.3.6"
+    "vite": "^7.1.0"
   }
 }
