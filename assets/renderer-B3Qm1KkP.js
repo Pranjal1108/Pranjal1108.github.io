@@ -1,4 +1,4 @@
-import{_ as fe}from"./index-DSt8bwKD.js";const me={version:1,wgsl:`// vgsl-module: C:\\Users\\pranj\\Documents\\Codex\\2026-10-04\\upgrade-goal-premium-interactive-3d-motion\\work\\portfolio-push\\portfolio\\src\\black-hole\\bake.wgsl
+import{_ as fe}from"./index-P0ZYyGxw.js";const me={version:1,wgsl:`// vgsl-module: C:\\Users\\pranj\\Documents\\Codex\\2026-10-04\\upgrade-goal-premium-interactive-3d-motion\\work\\portfolio-push\\portfolio\\src\\black-hole\\bake.wgsl
 // One-shot geodesic bake: store two disk crossings, the lensed sky, and view directions.
 
         
