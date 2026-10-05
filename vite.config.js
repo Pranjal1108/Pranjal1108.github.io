@@ -1,2 +1,4 @@
+import {wgslVitePlugin} from '@vgpu/wgsl/loader-vite';
 import {defineConfig} from 'vite';
-export default defineConfig({root:'portfolio',base:'/',server:{host:'127.0.0.1',port:4181},build:{outDir:'../.build',emptyOutDir:true,rollupOptions:{output:{manualChunks:{three:['three']}}}}});
+export default defineConfig({plugins:[wgslVitePlugin()],root:'portfolio',base:'/',server:{host:'127.0.0.1',port:4181},build:{outDir:'../.build',emptyOutDir:true,rollupOptions:{output:{manualChunks:{three:['three']}}}}});
+

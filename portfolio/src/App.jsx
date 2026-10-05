@@ -1,8 +1,15 @@
+import ContactBlackHole from './ContactBlackHole.jsx';
+import BallpitIsland from './BallpitIsland.jsx';
+import Credits from './Credits.jsx';
+import NameVeil from './NameVeil.jsx';
+import {paletteColor} from './palette.js';
 import React, {useEffect, useRef, useState, lazy, Suspense} from 'react';
 import {ArrowUpRight, ArrowRight, Plus, Minus, Pause, Play, Menu, X, Sun, Moon} from 'lucide-react';
 import {ScrollTrigger} from 'gsap/ScrollTrigger';
 import data from './portfolio.json';
+import GradualBlur from './GradualBlur.jsx';
 import {useChoreography} from './motion.js';
+const SplashCursor=lazy(()=>import('./SplashCursor.jsx'));
 const SpatialScene = lazy(()=>import('./SpatialScene.jsx'));
 const categories=['Developer tooling','Interactive systems','Web applications','Data & visualization'];
 const summaries=['Less setup. More shipping.','Precision, built into play.','A better path to the next role.','Complex data. Clearer decisions.'];
@@ -14,6 +21,7 @@ function SceneIsland({mode='sculpture',motion,theme}) {
  return <div ref={host} className={'scene-island '+mode}>
   <img className="scene-poster" src={'/assets/'+mode+(theme==='dark'?'-dark':'')+'-poster.webp'} alt="" aria-hidden="true" width="1200" height="1000" loading={mode==='sculpture'?'eager':'lazy'}/>
   {near&&<Suspense fallback={null}><SpatialScene mode={mode} motion={motion} theme={theme}/></Suspense>}
+  {mode!=='field'&&<GradualBlur className="scene-edge-blur" position="bottom" strength={1.5} divCount={5} exponential zIndex={1}/>}
  </div>;
 }
 function Project({project,index}) {
@@ -32,11 +40,12 @@ export default function App() {
  const [motion,setMotion]=useState(()=>!window.matchMedia('(prefers-reduced-motion: reduce)').matches);
  const [menu,setMenu]=useState(false);
  const [theme,setTheme]=useState(()=>{try{return localStorage.getItem('portfolio-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');}catch{return 'light';}});
- useEffect(()=>{document.documentElement.dataset.theme=theme;document.querySelector('meta[name="theme-color"]')?.setAttribute('content',theme==='dark'?'#171c17':'#e8e9e2');try{localStorage.setItem('portfolio-theme',theme);}catch{}},[theme]);
+ useEffect(()=>{document.documentElement.dataset.theme=theme;document.querySelector('meta[name="theme-color"]')?.setAttribute('content',paletteColor(theme==='dark'?'#171c17':'#e8e9e2'));try{localStorage.setItem('portfolio-theme',theme);}catch{}},[theme]);
  useEffect(()=>{const media=matchMedia('(prefers-reduced-motion: reduce)');const change=()=>setMotion(!media.matches);media.addEventListener('change',change);return()=>media.removeEventListener('change',change);},[]);
  useEffect(()=>{const close=e=>{if(e.key==='Escape')setMenu(false);};window.addEventListener('keydown',close);return()=>window.removeEventListener('keydown',close);},[]);
  useChoreography(root,motion);
  return <main ref={root} data-theme={theme} className={'portfolio '+(!motion?'motion-paused':'')}>
+  {motion&&<Suspense fallback={null}><SplashCursor SIM_RESOLUTION={innerWidth<800?64:128} DYE_RESOLUTION={innerWidth<800?256:512} PRESSURE_ITERATIONS={innerWidth<800?8:12} DENSITY_DISSIPATION={5} VELOCITY_DISSIPATION={9} PRESSURE={0.9} CURL={0} STRAIGHT_TRAIL={true} SPLAT_RADIUS={0.37 / 4} SPLAT_FORCE={2800} RAINBOW_MODE={true} COLOR_UPDATE_SPEED={18}/></Suspense>}
   <a className="skip" href="#work">Skip to content</a>
   <header className="masthead"><a href="#intro" className="identity" aria-label="Pranjal Saini, home">pranjal<span className="identity-star">✳</span></a>
    <nav id="mobile-nav" aria-label="Main navigation" className={menu?'is-open':''}><a href="#work" onClick={()=>setMenu(false)}>Work</a><a href="#about" onClick={()=>setMenu(false)}>About</a><a href="#contact" onClick={()=>setMenu(false)}>Contact <ArrowUpRight/></a></nav>
@@ -49,11 +58,21 @@ export default function App() {
   </section>
   <section className="statement section-space"><p className="statement-copy reveal">Good software starts<br/>with <span>a better question.</span></p><div className="statement-bottom"><p>I turn problems into practical tools, connected applications, and experiences you can interact with.</p><a className="line-link" href="#about">The person behind the work <ArrowRight/></a></div></section>
   <section id="work" className="work section-space"><div className="work-layout"><div className="work-intro"><span className="section-label">Selected work</span><h2>Made to<br/> do more.</h2><p>Four projects.<br/>Different problems.<br/>One curious mind.</p><a className="line-link" href={data.links[2].href} target="_blank" rel="noopener noreferrer">All repositories <ArrowUpRight/></a></div><div className="projects">{data.projects.map((project,index)=><Project key={project.name} project={project} index={index}/>)}</div></div></section>
-  <section className="field-section" aria-labelledby="field-title"><div className="field-title"><h2 id="field-title" className="reveal">A little curiosity.<br/>A different dimension.</h2><p>Move through the field. Tap to make a wave.</p></div><div className="field-art"><SceneIsland mode="field" motion={motion} theme={theme}/></div><p className="field-end" aria-hidden="true">Build.<br/>Learn.<br/>Repeat.</p></section>
-  <section id="about" className="about section-space"><div className="about-top"><span className="section-label">A work in progress</span><h2 className="reveal">Always building.<br/><span>Always learning.</span></h2></div><div className="about-body"><p className="about-intro">I’m Pranjal, a Computer Science student at Galgotias University, exploring the space between an idea and a working application.</p><div><p>My projects span Python tools, Java applications, data visualization, and interactive systems. Right now, I’m learning computer automation with PyAutoGUI, OpenCV, and Selenium.</p><p>I care about clear thinking, clean structure, and making things that are useful to someone.</p></div></div>
+  <section className="field-section" aria-labelledby="field-title"><div className="field-title"><h2 id="field-title" className="reveal">A little curiosity.<br/>A different dimension.</h2><p>Move your cursor. Stir things up.</p></div><div className="field-art"><BallpitIsland motion={motion}/></div><p className="field-end" aria-hidden="true">Build.<br/>Learn.<br/>Repeat.</p></section>
+  <section id="about" className="about section-space"><NameVeil motion={motion} theme={theme}/><div className="about-top"><span className="section-label">A work in progress</span><h2 className="reveal">Always building.<br/><span>Always learning.</span></h2></div><div className="about-body"><p className="about-intro">I’m a Computer Science student at Galgotias University, exploring the space between an idea and a working application.</p><div><p>My projects span Python tools, Java applications, data visualization, and interactive systems. Right now, I’m learning computer automation with PyAutoGUI, OpenCV, and Selenium.</p><p>I care about clear thinking, clean structure, and making things that are useful to someone.</p></div></div>
    <div className="background-grid"><div className="education"><h3>Education</h3>{data.education.map(item=><div className="education-item" key={item.name}><h4>{item.name}</h4><p>{item.degree}</p><small>{item.meta}</small></div>)}</div><div className="certifications"><h3>Beyond the classroom</h3>{data.certifications.map(item=><div className="cert-row" key={item.name}><span>{item.name}</span><span>{item.issuer}</span></div>)}</div></div>
   </section>
   <section id="skills" className="skills section-space"><h2>Tools of<br/><span>the practice.</span></h2><div className="skills-list">{data.skills.map(group=><div className="skill-row" key={group.name}><h3>{group.name}</h3><p>{group.items.join(' / ')}</p><ArrowUpRight aria-hidden="true"/></div>)}</div></section>
-  <footer id="contact" className="contact section-space"><div className="contact-top"><p>Have something in mind?</p><span>Open to opportunities & collaboration</span></div><a className="contact-title magnetic" href={data.links[0].href}>Let’s make<br/>it happen.<ArrowUpRight/></a><a href={data.links[0].href} className="email-link">pranjalsaini3030@gmail.com <ArrowUpRight/></a><div className="footer-bottom"><a href="#intro" className="identity">pranjal<span className="identity-star">✳</span></a><div className="social-links">{data.links.slice(1).map(link=><a href={link.href} key={link.name} target="_blank" rel="noopener noreferrer">{link.name}<ArrowUpRight/></a>)}</div><div className="footer-info"><span>© {new Date().getFullYear()} Pranjal Saini</span><span>This website is vibe coded.</span></div></div></footer>
+  <footer id="contact" className="contact section-space"><ContactBlackHole motion={motion}/><div className="contact-top"><p>Have something in mind?</p><span>Open to opportunities & collaboration</span></div><a className="contact-title magnetic" href={data.links[0].href}>Let’s make<br/>it happen.<ArrowUpRight/></a><a href={data.links[0].href} className="email-link">pranjalsaini3030@gmail.com <ArrowUpRight/></a><Credits/><div className="footer-bottom"><a href="#intro" className="identity">pranjal<span className="identity-star">✳</span></a><div className="social-links">{data.links.slice(1).map(link=><a href={link.href} key={link.name} target="_blank" rel="noopener noreferrer">{link.name}<ArrowUpRight/></a>)}</div><div className="footer-info"><span>© {new Date().getFullYear()} Pranjal Saini</span></div></div></footer>
  </main>;
 }
+
+
+
+
+
+
+
+
+
+

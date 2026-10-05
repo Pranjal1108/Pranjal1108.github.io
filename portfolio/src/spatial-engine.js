@@ -1,3 +1,4 @@
+import {paletteColor} from './palette.js';
 import * as T from 'three';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import gsap from 'gsap';
@@ -14,13 +15,7 @@ void main(){
  vec4 paint=texture2DLodEXT(flow,vUv,0.);
  vec2 velocity=paint.rg/resolution;
  float energy=clamp(length(paint.rg)/38.,0.,1.);
- vec2 offset=velocity*.85;
- float age=time-wave.z;
- if(age>0.&&age<1.7){
-  vec2 delta=(vUv-wave.xy)*vec2(resolution.x/resolution.y,1.);
-  float front=length(delta)-age*.6;
-  if(abs(front)<.15){float shock=sin(front*90.)*exp(-front*front*260.)*exp(-age*2.2);offset+=normalize(delta+vec2(.0001))*shock*.012;}
- }
+ vec2 offset=velocity*1.4;
  if(length(offset*resolution)<.08){
   gl_FragColor=texture2DLodEXT(image,vUv,0.);
   #include <colorspace_fragment>
@@ -32,11 +27,6 @@ void main(){
   float t=float(i)/3.;vec2 uv=clamp(vUv-offset*(.2+t),vec2(.001),vec2(.999));
   col+=vec3(texture2DLodEXT(image,uv+offset*.16,0.).r,texture2DLodEXT(image,uv,0.).g,texture2DLodEXT(image,uv-offset*.16,0.).b)/4.;
  }
- // Optical dispersion lives at the turbulent edges of the moving wake.
- vec2 px=1./resolution*12.;
- float edge=abs(texture2DLodEXT(flow,vUv+px,0.).b-texture2DLodEXT(flow,vUv-px,0.).b);
- vec3 spectral=.5+.5*cos(paint.r* .09+paint.g*.07+vec3(0.,2.1,4.2));
- col+=spectral*edge*energy*.18;
  gl_FragColor=vec4(col,1.);
  #include <colorspace_fragment>
 }`;
@@ -49,7 +39,7 @@ export function createSpatialScene(host,mode,initialMotion,initialTheme='light')
  renderer.outputColorSpace=T.SRGBColorSpace;
  renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;
  host.appendChild(renderer.domElement);
- const scene=new T.Scene();scene.background=new T.Color(mode==='field'?'#dedfd6':'#e8e9e2');
+ const scene=new T.Scene();scene.background=new T.Color(mode==='field'?paletteColor('#dedfd6'):paletteColor('#e8e9e2'));
  const camera=new T.PerspectiveCamera(35,1,.1,50);camera.position.set(0,0,8);
  const group=new T.Group();scene.add(group);
  let env,pmrem,room,object,grid,gridBase,gridPositions,gridGeometry,pointMaterial;
@@ -58,16 +48,16 @@ export function createSpatialScene(host,mode,initialMotion,initialTheme='light')
  if(mode==='sculpture') {
   pmrem=new T.PMREMGenerator(renderer);room=new RoomEnvironment();env=pmrem.fromScene(room,.04);scene.environment=env.texture;
   const geometry=new T.TorusKnotGeometry(1.2,.36,compact?160:240,compact?20:32,2,3);
-  const material=new T.MeshPhysicalMaterial({color:'#d1d9d4',metalness:1,roughness:.16,clearcoat:1,clearcoatRoughness:.14,iridescence:.24,iridescenceIOR:1.3,iridescenceThicknessRange:[120,330],envMapIntensity:1.8});
+  const material=new T.MeshPhysicalMaterial({color:paletteColor('#d1d9d4'),metalness:1,roughness:.16,clearcoat:1,clearcoatRoughness:.14,iridescence:.24,iridescenceIOR:1.3,iridescenceThicknessRange:[120,330],envMapIntensity:1.8});
   object=new T.Mesh(geometry,material);object.rotation.set(.32,-.45,.45);group.add(object);resources.push(geometry,material);
-  scene.add(new T.HemisphereLight('#ffffff','#616d59',2));
-  const light=new T.DirectionalLight('#ffffff',4);light.position.set(3,5,4);scene.add(light);
+  scene.add(new T.HemisphereLight(paletteColor('#ffffff'),paletteColor('#616d59'),2));
+  const light=new T.DirectionalLight(paletteColor('#ffffff'),4);light.position.set(3,5,4);scene.add(light);
  } else {
   // A breathing spherical membrane: evenly distributed points, no loops or chain.
   const count=compact?3000:6500,positions=new Float32Array(count*3);
   for(let i=0;i<count;i++){const y=1-2*(i+.5)/count,r=Math.sqrt(1-y*y),angle=i*Math.PI*(3-Math.sqrt(5));positions.set([Math.cos(angle)*r*1.6,y*1.6,Math.sin(angle)*r*1.6],i*3);}
   const geometry=new T.BufferGeometry();geometry.setAttribute('position',new T.BufferAttribute(positions,3));
-  pointMaterial=new T.ShaderMaterial({transparent:true,depthWrite:false,uniforms:{clock:fieldTime,pointer:fieldPointer,tint:{value:new T.Color('#354137')},pointSize:{value:compact?16:18}},vertexShader:`
+  pointMaterial=new T.ShaderMaterial({transparent:true,depthWrite:false,uniforms:{clock:fieldTime,pointer:fieldPointer,tint:{value:new T.Color(paletteColor('#354137'))},pointSize:{value:compact?16:18}},vertexShader:`
    uniform float clock;uniform vec2 pointer;uniform float pointSize;varying float shade;
    void main(){vec3 n=normalize(position);float lat=atan(n.z,n.x);float wave=sin(lat*6.+clock*.7+n.y*5.)*.10+sin(n.y*9.-clock*.8)*.06;
    float pull=pow(max(0.,dot(n,normalize(vec3(pointer*.8,1.)))),8.)*.16;
@@ -82,7 +72,7 @@ export function createSpatialScene(host,mode,initialMotion,initialTheme='light')
   for(let y=0;y<n;y++)for(let x=0;x<n;x++){const i=x+y*n;if(x<n-1)indices.push(i,i+1);if(y<n-1)indices.push(i,i+n);}
   gridPositions=new Float32Array(coords);gridBase=new Float32Array(coords);gridGeometry=new T.BufferGeometry();
   gridGeometry.setAttribute('position',new T.BufferAttribute(gridPositions,3).setUsage(T.DynamicDrawUsage));gridGeometry.setIndex(indices);
-  const material=new T.LineBasicMaterial({color:'#667568',transparent:true,opacity:.16});grid=new T.LineSegments(gridGeometry,material);scene.add(grid);resources.push(gridGeometry,material);
+  const material=new T.LineBasicMaterial({color:paletteColor('#667568'),transparent:true,opacity:.16});grid=new T.LineSegments(gridGeometry,material);scene.add(grid);resources.push(gridGeometry,material);
  }
  const target=new T.WebGLRenderTarget(1,1,{depthBuffer:true,type:T.UnsignedByteType});target.samples=compact?0:2;
  const size=compact?48:96,data=new Float32Array(size*size*4),scratch=new Float32Array(size*size*4),flow=new T.DataTexture(data,size,size,T.RGBAFormat,T.FloatType);
@@ -142,10 +132,10 @@ export function createSpatialScene(host,mode,initialMotion,initialTheme='light')
  }
  function render(timestamp){const renderStart=performance.now();frame=0;if(disposed||document.hidden||!visible)return;
   const elapsed=last?timestamp-last:16.7;const dt=Math.min(elapsed/1000,.05);last=timestamp;
-  if(enabled){time+=dt;updateFlow(dt);cx+=(pointer.active?(pointer.x-.5)*.22-cx:-cx)*.04;cy+=(pointer.active?(pointer.y-.5)*.18-cy:-cy)*.04;
-   group.rotation.y=time*.075+cx+scrollProgress*.8;group.rotation.x=Math.sin(time*.2)*.08-cy+scrollProgress*.18;
+  if(enabled){time+=dt;updateFlow(dt);const follow=1-Math.exp(-7*dt),gainX=mode==='sculpture'?.72:.4,gainY=mode==='sculpture'?.52:.32;cx+=((pointer.active?(pointer.x-.5)*gainX:0)-cx)*follow;cy+=((pointer.active?(pointer.y-.5)*gainY:0)-cy)*follow;
+   group.rotation.z=cx*.18;host.dataset.pointerTilt=[cx.toFixed(3),cy.toFixed(3)].join(",");group.rotation.y=time*.075+cx+scrollProgress*.8;group.rotation.x=Math.sin(time*.2)*.08-cy+scrollProgress*.18;
    group.scale.setScalar(mode==='field'?1+scrollProgress*.16:(width<800?.68:.9));
-   if(mode==='field')group.position.y=Math.sin(time*.6)*.045;else{const vh=2*camera.position.z*Math.tan(35*Math.PI/360);group.position.y=(width>=800?0:-vh*.22)+Math.sin(time*.6)*.045;}
+   if(mode==='field')group.position.y=Math.sin(time*.6)*.045;else{const vh=2*camera.position.z*Math.tan(35*Math.PI/360);group.position.x=(width>=800?vh*camera.aspect*.22:0)+cx*.28;group.position.y=(width>=800?0:-vh*.22)+Math.sin(time*.6)*.045+cy*.16;}
    fieldTime.value=time;fieldPointer.value.set(cx*4,cy*4);
    if(grid){const wave=uniforms.wave.value,age=time-wave.z;
     for(let i=0;i<gridPositions.length;i+=3){const x=gridBase[i],y=gridBase[i+1],d=Math.hypot(x-gridPointer.x,y-gridPointer.y),pull=pointer.active?Math.exp(-d*d*.8):0;
@@ -169,7 +159,7 @@ export function createSpatialScene(host,mode,initialMotion,initialTheme='light')
  const visibility=()=>{cancelAnimationFrame(frame);frame=0;last=0;if(!document.hidden)request();};
  const contextLost=e=>{e.preventDefault();cancelAnimationFrame(frame);frame=0;host.dataset.state='fallback';renderer.domElement.style.opacity='0';};
  const contextRestored=()=>{host.dataset.state='loading';renderer.domElement.style.opacity='';request();};
- function setTheme(theme){const dark=theme==='dark';scene.background.set(dark?(mode==='field'?'#1d241d':'#171c17'):(mode==='field'?'#dedfd6':'#e8e9e2'));if(pointMaterial)pointMaterial.uniforms.tint.value.set(dark?'#bdcea9':'#354137');if(grid){grid.material.color.set(dark?'#a2b093':'#667568');grid.material.opacity=dark?.07:.10;}host.dataset.theme=theme;request();}
+ function setTheme(theme){const dark=theme==='dark';scene.background.set(dark?(mode==='field'?paletteColor('#1d241d'):paletteColor('#171c17')):(mode==='field'?paletteColor('#dedfd6'):paletteColor('#e8e9e2')));if(pointMaterial)pointMaterial.uniforms.tint.value.set(dark?paletteColor('#bdcea9'):paletteColor('#354137'));if(grid){grid.material.color.set(dark?paletteColor('#a2b093'):paletteColor('#667568'));grid.material.opacity=dark?.07:.10;}host.dataset.theme=theme;request();}
  window.addEventListener('pointermove',move,{passive:true});document.documentElement.addEventListener('pointerleave',leave);window.addEventListener('pointerdown',press,{passive:true});document.addEventListener('visibilitychange',visibility);
  renderer.domElement.addEventListener('webglcontextlost',contextLost);renderer.domElement.addEventListener('webglcontextrestored',contextRestored);
  setTheme(initialTheme);resize();
@@ -177,9 +167,3 @@ export function createSpatialScene(host,mode,initialMotion,initialTheme='light')
   dispose(){disposed=true;cancelAnimationFrame(frame);scrollTrigger?.kill();observer.disconnect();resizer.disconnect();window.removeEventListener('pointermove',move);document.documentElement.removeEventListener('pointerleave',leave);window.removeEventListener('pointerdown',press);document.removeEventListener('visibilitychange',visibility);renderer.domElement.removeEventListener('webglcontextlost',contextLost);renderer.domElement.removeEventListener('webglcontextrestored',contextRestored);resources.forEach(r=>r.dispose());env?.dispose();room?.dispose();pmrem?.dispose();renderer.dispose();renderer.forceContextLoss();renderer.domElement.remove();}
  };
 }
-
-
-
-
-
-

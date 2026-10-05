@@ -1,6 +1,6 @@
 # Pranjal Saini — Portfolio
 
-An editorial portfolio with a procedural chrome sculpture, refractive pointer trails, a kinetic grid and breathing particle sphere, GSAP scroll choreography, and a clean project list. Light and dark modes cover both the page and WebGL scenes, with the selected mode remembered locally.
+An editorial portfolio with a procedural chrome sculpture, viewport-wide iridescent directional trails, a kinetic grid and breathing particle sphere, GSAP scroll choreography, and a clean project list. Light and dark modes cover both the page and WebGL scenes, with the selected mode remembered locally.
 
 ## Development
 
@@ -33,4 +33,5 @@ Portfolio content lives in `src/portfolio.json`; the main composition lives in `
 
 Legacy flight files and assets are retained, but are not imported or requested by the redesigned experience.
 
-Pointer interaction uses an advected velocity field to smear and refract actual scene pixels. The hero media plane spans the window width; there is no colored cursor overlay. Visual behavior was studied from https://lusion.co without reusing its proprietary source.
+
+Cursor motion uses React Bits Splash Cursor, adapted with idle/hidden suspension, resource cleanup, capped pixel ratio, 512px desktop dye resolution and reduced mobile quality. The trail uses directional advection with curling and pressure-driven eddies disabled. Dye dissipates quickly, a smooth global fade clears all fluid buffers after one second of pointer inactivity, and the display shader applies translucent thin-film iridescence. The sculpture responds with stronger damped tilt, banking and a small positional lean. The 3D scenes retain their directional hover refraction and morphing alongside the fluid trail. The trail radius is now half the initial Splash Cursor size (25% narrower than the previous revision), with a tighter, stronger 3D refraction area. Source: https://github.com/DavidHDev/react-bits/blob/main/src/content/Animations/SplashCursor/SplashCursor.jsx . React Bits and the upstream Pavel Dobryakov fluid solver license notices are in `licenses/`.

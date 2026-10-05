@@ -1,0 +1,6 @@
+.gradual-blur{pointer-events:none}
+.gradual-blur-parent{overflow:hidden}
+.gradual-blur-inner{pointer-events:none}
+.scene-edge-blur{height:clamp(70px,15%,150px)!important}
+.scene-edge-blur:after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,transparent,color-mix(in srgb,var(--paper) 70%,transparent));pointer-events:none}
+@media(max-width:799px){.scene-edge-blur{height:70px!important}.scene-edge-blur .gradual-blur-inner>div:nth-child(even){display:none}}
