@@ -9,9 +9,11 @@
     <style>html[data-theme=dark]{background:#171c17;color-scheme:dark}</style>
     <title>Pranjal Saini - Portfolio</title>
     <link rel="icon" href="data:," />
-  </head>
-  <body>
-    <div id="root"></div>
+  <style>body.is-loading{overflow:hidden}#opening-loader{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;justify-content:center;padding:8vw;background:#e8e9e2;color:#171c17;font:16px system-ui;transition:opacity .4s}html[data-theme=dark] #opening-loader{background:#171c17;color:#e8e9e2}.loader-brand{font-size:clamp(44px,8vw,110px);letter-spacing:-.07em}.loader-bottom{display:flex;justify-content:space-between;margin-top:48px}.loader-track{height:1px;background:currentColor;opacity:.5;margin-top:16px;width:var(--progress,0%);transition:width .2s}#opening-loader.is-complete{opacity:0;pointer-events:none}@media(prefers-reduced-motion:reduce){#opening-loader,.loader-track{transition:none}}@keyframes infinity-loader-travel{from{stroke-dashoffset:0}to{stroke-dashoffset:-100}}.infinity-loader{align-self:center;margin-bottom:28px;color:var(--tone-c2d9b3,currentColor)}.infinity-travel{animation:infinity-loader-travel 2s linear infinite}.loader-brand{text-align:center;font-size:24px;letter-spacing:-.04em}.loader-bottom{margin-top:48px}@media(prefers-reduced-motion:reduce){.infinity-travel{animation:none}}</style></head>
+  <body class="is-loading">
+    <div id="opening-loader" role="status" aria-live="polite"><svg class="infinity-loader" viewBox="-2 -2 44 44" width="160" height="160" aria-hidden="true"><path fill="none" stroke="currentColor" opacity=".12" stroke-width="4" pathLength="100" d="M29.76 18.72 c0 7.28-3.92 13.6-9.84 16.96 c-2.88 1.68-6.24 2.64-9.84 2.64 c-3.6 0-6.88-0.96-9.76-2.64 c0-7.28 3.92-13.52 9.84-16.96 c2.88-1.68 6.24-2.64 9.76-2.64 S26.88 17.04 29.76 18.72 c5.84 3.36 9.76 9.68 9.84 16.96 c-2.88 1.68-6.24 2.64-9.76 2.64 c-3.6 0-6.88-0.96-9.84-2.64 c-5.84-3.36-9.76-9.68-9.76-16.96 c0-7.28 3.92-13.6 9.76-16.96 C25.84 5.12 29.76 11.44 29.76 18.72z"/><path class="infinity-travel" fill="none" stroke="currentColor" stroke-width="4" stroke-dasharray="15 85" stroke-linecap="round" pathLength="100" d="M29.76 18.72 c0 7.28-3.92 13.6-9.84 16.96 c-2.88 1.68-6.24 2.64-9.84 2.64 c-3.6 0-6.88-0.96-9.76-2.64 c0-7.28 3.92-13.52 9.84-16.96 c2.88-1.68 6.24-2.64 9.76-2.64 S26.88 17.04 29.76 18.72 c5.84 3.36 9.76 9.68 9.84 16.96 c-2.88 1.68-6.24 2.64-9.76 2.64 c-3.6 0-6.88-0.96-9.84-2.64 c-5.84-3.36-9.76-9.68-9.76-16.96 c0-7.28 3.92-13.6 9.76-16.96 C25.84 5.12 29.76 11.44 29.76 18.72z"/></svg><span class="loader-brand">pranjal ✳</span><div class="loader-bottom"><span id="loading-status">Preparing the experience</span><span id="loading-progress">0%</span></div><div class="loader-track"></div></div><div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
+
+
