@@ -123,7 +123,7 @@ class x {
     if (this.#a) clearTimeout(this.#a);
     this.#a = setTimeout(this.resize.bind(this), 100);
   }
-  resize() {
+  resize(force = false) {
     let e, t;
     if (this.#e.size instanceof Object) {
       e = this.#e.size.width;
@@ -135,6 +135,7 @@ class x {
       e = window.innerWidth;
       t = window.innerHeight;
     }
+    if (!force && e === this.size.width && t === this.size.height) return;
     this.size.width = e;
     this.size.height = t;
     this.size.ratio = e / t;
@@ -263,10 +264,10 @@ function S(e) {
         document.body.addEventListener('pointerleave', L);
         document.body.addEventListener('click', C);
 
-        document.body.addEventListener('touchstart', TouchStart, { passive: false });
-        document.body.addEventListener('touchmove', TouchMove, { passive: false });
-        document.body.addEventListener('touchend', TouchEnd, { passive: false });
-        document.body.addEventListener('touchcancel', TouchEnd, { passive: false });
+        document.body.addEventListener('touchstart', TouchStart, { passive: true });
+        document.body.addEventListener('touchmove', TouchMove, { passive: true });
+        document.body.addEventListener('touchend', TouchEnd, { passive: true });
+        document.body.addEventListener('touchcancel', TouchEnd, { passive: true });
 
         R = true;
       }
@@ -335,7 +336,7 @@ function L() {
 
 function TouchStart(e) {
   if (e.touches.length > 0) {
-    e.preventDefault();
+
     A.x = e.touches[0].clientX;
     A.y = e.touches[0].clientY;
 
@@ -356,7 +357,7 @@ function TouchStart(e) {
 
 function TouchMove(e) {
   if (e.touches.length > 0) {
-    e.preventDefault();
+
     A.x = e.touches[0].clientX;
     A.y = e.touches[0].clientY;
 
@@ -667,18 +668,19 @@ function createBallpit(e, t = {}) {
     rendererOptions: { antialias: true, alpha: true }
   });
   let s;
+  i.maxPixelRatio = matchMedia('(pointer: coarse)').matches ? 1 : 1.25;
   i.renderer.toneMapping = v;
   i.camera.position.set(0, 0, 20);
   i.camera.lookAt(0, 0, 0);
   i.cameraMaxAspect = 1.5;
-  i.resize();
+  i.resize(true);
   initialize(t);
   const n = new y();
   const o = new w(new a(0, 0, 1), 0);
   const r = new a();
   let c = false;
 
-  e.style.touchAction = 'pan-y';
+  e.style.touchAction = 'pan-y pinch-zoom';
   e.style.userSelect = 'none';
   e.style.webkitUserSelect = 'none';
 
@@ -700,7 +702,7 @@ function createBallpit(e, t = {}) {
       i.clear();
       i.scene.remove(s);
     }
-    s = new Z(i.renderer, e);
+    s = new Z(i.renderer, { ...e, maxX: i.size.wWidth / 2, maxY: i.size.wHeight / 2 });
     i.scene.add(s);
   }
   i.onBeforeRender = e => {
@@ -775,5 +777,8 @@ const Ballpit = ({ className = '', followCursor = true, ...props }) => {
 };
 
 export default Ballpit;
+
+
+
 
 

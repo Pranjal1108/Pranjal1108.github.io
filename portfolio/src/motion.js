@@ -2,6 +2,7 @@ import {useEffect} from 'react';
 import gsap from 'gsap';
 import {ScrollTrigger} from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
+ScrollTrigger.config({ignoreMobileResize:true});
 export function useChoreography(root,enabled) {
  useEffect(()=>{
   if(!enabled)return;
@@ -12,7 +13,7 @@ export function useChoreography(root,enabled) {
     gsap.from('.hero-description, .hero .round-link',{opacity:0,y:20,duration:.8,delay:.35,stagger:.15,clearProps:'all'});
     gsap.utils.toArray('.reveal').forEach(el=>gsap.from(el,{opacity:0,y:45,duration:.85,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 90%',once:true},clearProps:'all'}));
    });
-   mm.add('(min-width: 900px) and (prefers-reduced-motion: no-preference)',()=>{
+   mm.add('(min-width: 900px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)',()=>{
     gsap.to('.hero-copy',{y:100,opacity:.4,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1}});
     const field=gsap.timeline({scrollTrigger:{trigger:'.field-section',start:'top top',end:()=>'+='+innerHeight*.75,pin:true,scrub:1,invalidateOnRefresh:true}});
     field.to('.field-title',{y:-60,opacity:0,duration:.6}).fromTo('.field-end',{y:50,opacity:0},{y:0,opacity:1,duration:.6},.4);
@@ -33,3 +34,4 @@ export function useChoreography(root,enabled) {
   return()=>{window.removeEventListener('pointermove',pointer);document.documentElement.removeEventListener('pointerleave',reset);buttons.forEach(({el,x,y})=>{x.tween.kill();y.tween.kill();gsap.set(el,{clearProps:'transform'});});mm.revert();ctx.revert();};
  },[root,enabled]);
 }
+

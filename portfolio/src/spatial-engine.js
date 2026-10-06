@@ -86,7 +86,8 @@ export function createSpatialScene(host,mode,initialMotion,initialTheme='light')
  const section=host.closest(mode==='field'?'.field-section':'.hero');
  const scrollTrigger=section?ScrollTrigger.create({trigger:section,start:'top bottom',end:'bottom top',onUpdate:self=>{if(enabled){scrollProgress=self.progress;request();}}}):null;
  const raycaster=new T.Raycaster(),plane=new T.Plane(new T.Vector3(0,0,1),1.8),gridPointer=new T.Vector3(100,100,0);
- function resize(){const r=host.getBoundingClientRect();width=Math.max(1,r.width);height=Math.max(1,r.height);renderer.setSize(width,height);camera.aspect=width/height;camera.position.z=mode==='sculpture'?(width/height<.8?9.4:7.3):8.5;camera.updateProjectionMatrix();if(mode==='sculpture'){
+ let sizedDpr=0;
+ function resize(){const r=host.getBoundingClientRect();const nextWidth=Math.max(1,Math.round(r.width)),nextHeight=Math.max(1,Math.round(r.height)),nextDpr=renderer.getPixelRatio();if(nextWidth===width&&nextHeight===height&&nextDpr===sizedDpr)return;width=nextWidth;height=nextHeight;sizedDpr=nextDpr;renderer.setSize(width,height,false);camera.aspect=width/height;camera.position.z=mode==='sculpture'?(width/height<.8?9.4:7.3):8.5;camera.updateProjectionMatrix();if(mode==='sculpture'){
    group.scale.setScalar(width<800?.68:.9);const viewHeight=2*camera.position.z*Math.tan(35*Math.PI/360);
    group.position.x=width>=800?viewHeight*camera.aspect*.22:0;
    group.position.y=width>=800?0:-viewHeight*.22;
@@ -167,3 +168,4 @@ export function createSpatialScene(host,mode,initialMotion,initialTheme='light')
   dispose(){disposed=true;cancelAnimationFrame(frame);scrollTrigger?.kill();observer.disconnect();resizer.disconnect();window.removeEventListener('pointermove',move);document.documentElement.removeEventListener('pointerleave',leave);window.removeEventListener('pointerdown',press);document.removeEventListener('visibilitychange',visibility);renderer.domElement.removeEventListener('webglcontextlost',contextLost);renderer.domElement.removeEventListener('webglcontextrestored',contextRestored);resources.forEach(r=>r.dispose());env?.dispose();room?.dispose();pmrem?.dispose();renderer.dispose();renderer.forceContextLoss();renderer.domElement.remove();}
  };
 }
+
