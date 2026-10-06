@@ -88,6 +88,7 @@ export function SlidingNumber({
   decimalSeparator = '.',
 }: SlidingNumberProps) {
   const reduced = useReducedMotion();
+  if (reduced) return <span>{value}</span>;
   const absValue = Math.abs(value);
   const [integerPart, decimalPart] = absValue.toString().split('.');
   const integerValue = parseInt(integerPart, 10);
@@ -123,5 +124,6 @@ export function SlidingNumber({
     </div>
   );
 }
+
 
 
