@@ -51,11 +51,11 @@ export function createRenderer({ canvas }: RendererOptions) {
       settings,
       mobileQuery.matches
         ? {
-            centerX: 0,
-            centerY: 0,
-            cameraRoll: 0,
+            centerX: 0.35,
+            centerY: 0.1,
+            cameraRoll: -0.27,
             mouseYaw: 0,
-            centerFade: 1,
+            centerFade: 0,
           }
         : desktopLayout
     );
@@ -316,3 +316,4 @@ export function createRenderer({ canvas }: RendererOptions) {
 function clockMs(): number {
   return typeof performance === "undefined" ? Date.now() : performance.now();
 }
+
