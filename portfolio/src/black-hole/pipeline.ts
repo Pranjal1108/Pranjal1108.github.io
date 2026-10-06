@@ -321,9 +321,11 @@ export function setPostUniforms(
 export async function prewarm(
   effects: Effects,
   targets: Targets,
-  output: Output
+  output: Output,
+  onProgress?: (completed: number, total: number) => void
 ): Promise<void> {
   const bloomOutput = { colors: [targets.bloom0.format] };
+  let completed = 0;
   await Promise.all([
     effects.bake.compile(targets.gbuffer),
     effects.refine.compile(targets.aa),
@@ -338,7 +340,7 @@ export async function prewarm(
     effects.bloomBlurH2.compile(bloomOutput),
     effects.bloomBlurV2.compile(bloomOutput),
     effects.composite.compile({ colors: [output.format] }),
-  ]);
+  ].map(task => task.then(() => onProgress?.(++completed, 13))));
 }
 
 export function renderChain(
@@ -403,3 +405,4 @@ function scaleSize(
     Math.max(1, Math.floor(size[1] / divisor)),
   ];
 }
+

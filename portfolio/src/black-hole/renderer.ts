@@ -32,11 +32,12 @@ const MOBILE_QUERY = "(max-width: 767px)";
 
 interface RendererOptions {
   canvas: HTMLCanvasElement;
+  onProgress?: (percent: number) => void;
 }
 
 type RenderSize = { width: number; height: number };
 
-export function createRenderer({ canvas }: RendererOptions) {
+export function createRenderer({ canvas, onProgress }: RendererOptions) {
   const settings = defaultHeroSettings();
   const desktopLayout = {
     centerX: settings.centerX,
@@ -255,7 +256,9 @@ export function createRenderer({ canvas }: RendererOptions) {
   };
 
   const initialize = async () => {
+    onProgress?.(10);
     const vgpu = await import("vgpu");
+    onProgress?.(20);
     const { init } = vgpu;
     if (disposed) return;
     const nextGpu = await init();
@@ -263,6 +266,7 @@ export function createRenderer({ canvas }: RendererOptions) {
       nextGpu.dispose();
       return;
     }
+    onProgress?.(35);
     gpu = nextGpu;
     api = vgpu;
     surface = vgpu.surface(gpu, canvas, { dpr: 1 });
@@ -272,7 +276,8 @@ export function createRenderer({ canvas }: RendererOptions) {
     setShadeUniforms(effects, targets, settings, animationTime, currentSceneYaw);
     setBindings(effects, targets);
     setPostUniforms(effects, targets, settings);
-    await prewarm(effects, targets, surface);
+    onProgress?.(40);
+    await prewarm(effects, targets, surface, (done, total) => { if (!disposed) onProgress?.(40 + Math.round(done / total * 55)); });
     if (disposed) return;
     observer =
       typeof ResizeObserver === "undefined"
@@ -295,6 +300,8 @@ export function createRenderer({ canvas }: RendererOptions) {
       intersection.observe(canvas);
     }
     measure();
+    vgpu.frame(gpu, renderFrame);
+    onProgress?.(100);
     started = true;
     documentVisible = !document.hidden;
     reconcileLoop();
@@ -316,4 +323,5 @@ export function createRenderer({ canvas }: RendererOptions) {
 function clockMs(): number {
   return typeof performance === "undefined" ? Date.now() : performance.now();
 }
+
 

@@ -2,6 +2,7 @@ import React,{useState} from 'react';
 import {Plus} from 'lucide-react';
 import {ScrollTrigger} from 'gsap/ScrollTrigger';
 const credits=[
+ ['Motion Primitives / Julien Thibeaut','https://21st.dev/@ibelick/components/sliding-number','Sliding scene-loading percentage'],
  ['Ravi Katiyar / 21st.dev','https://21st.dev/@ravikatiyar162/components/loader-13','Infinity opening loader'],
  ['VGPU / Vercel Labs','https://21st.dev/@vgpu/components/optimized-black-hole','Optimized Black Hole contact backdrop'],
  ['React Bits','https://reactbits.dev','Ballpit, Splash Cursor, Gradual Blur & Dither Veil'],
@@ -20,6 +21,7 @@ export default function Credits(){const [open,setOpen]=useState(false);return <s
  <div className="credits-grid">{credits.map(([name,url,role])=><a key={name} href={url} target="_blank" rel="noopener noreferrer"><span>{name} ↗</span><small>{role}</small></a>)}</div>
  <p className="credits-note">Design references: <a href="https://21st.dev" target="_blank" rel="noopener noreferrer">21st.dev</a> and <a href="https://lusion.co" target="_blank" rel="noopener noreferrer">Lusion</a>. Retained shader utilities: <a href="https://smoothui.dev" target="_blank" rel="noopener noreferrer">SmoothUI / Eduardo Calvo</a>. Thank you to the open-source community.</p>
  </div></div></section>}
+
 
 
 
